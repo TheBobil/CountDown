@@ -1,0 +1,2767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h1 span {
+            color: #4facfe;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .player-score {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(79, 172, 254, 0.2);
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+            min-width: 100px;
+        }
+
+        .player-score h3 {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
+        }
+
+        .player-score .score {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .player-colors {
+            --p1-color: #4facfe;
+            --p2-color: #f093fb;
+            --p3-color: #38ef7d;
+            --p4-color: #f5af19;
+            --p5-color: #eb3349;
+            --p6-color: #667eea;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-blue { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #1a1a2e; }
+        .btn-purple { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-green { background: linear-gradient(135deg, #11998e, #38ef7d); color: #1a1a2e; }
+        .btn-red { background: linear-gradient(135deg, #eb3349, #f45c43); color: white; }
+        .btn-gold { background: linear-gradient(135deg, #f5af19, #f12711); color: white; }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .menu {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .menu h2 {
+            margin-bottom: 30px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Player Setup Styles */
+        .setup-screen {
+            background: white;
+            border: 4px solid #4facfe;
+            border-radius: 15px;
+            padding: 30px;
+            color: #1a1a2e;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .setup-screen h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #1a1a2e;
+        }
+
+        .player-count-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .player-count-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #4facfe;
+            background: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a2e;
+        }
+
+        .player-count-btn:hover {
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        .player-count-btn.selected {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .player-names-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .player-name-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-name-input .player-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .player-name-input input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .player-name-input input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .setup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .game-board {
+            background: white;
+            border: 4px solid #4facfe;
+            border-radius: 15px;
+            padding: 30px;
+            color: #1a1a2e;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-header h2 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
+        .timer.warning {
+            color: #eb3349;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .game-main {
+            flex: 1;
+        }
+
+        .game-sidebar {
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tiles {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tile {
+            width: 60px;
+            height: 70px;
+            background: #e0e0e0;
+            border: 3px solid #4facfe;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .tile.filled {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .tile.small {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        .tile.large {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            color: white;
+        }
+
+        .tile.conundrum {
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            color: white;
+            width: 65px;
+            height: 75px;
+            font-size: 2.2rem;
+        }
+
+        .tile.conundrum.reveal {
+            animation: flipIn 0.3s ease forwards;
+        }
+
+        @keyframes flipIn {
+            0% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0); }
+        }
+
+        .deck {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .deck:hover {
+            transform: translateY(-5px);
+        }
+
+        .deck.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .deck-card {
+            width: 140px;
+            height: 160px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .deck-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .deck-consonants { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .deck-vowels { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .deck-small { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .deck-large { background: linear-gradient(135deg, #eb3349, #f45c43); }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .thinking-display {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2));
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 3px solid #4facfe;
+        }
+
+        .thinking-display h3 {
+            font-size: 1.8rem;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .thinking-display p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .input-area {
+            background: rgba(79, 172, 254, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .input-area h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .player-inputs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .player-input {
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+        }
+
+        .player-input.locked {
+            background: #e0e0e0;
+        }
+
+        .player-input h4 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-input input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1rem;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .player-input .btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .target-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .target-display {
+            background: #1a1a2e;
+            color: #4facfe;
+            font-size: 2.5rem;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 3px solid #4facfe;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .conundrum-container {
+            text-align: center;
+        }
+
+        .buzz-area {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .buzz-btn {
+            padding: 20px 25px;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .buzz-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .buzz-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .buzz-btn.active {
+            animation: buzzPulse 0.5s infinite;
+            box-shadow: 0 0 30px gold;
+        }
+
+        @keyframes buzzPulse {
+            0%, 100% { box-shadow: 0 0 20px gold; }
+            50% { box-shadow: 0 0 40px gold; }
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(245, 175, 25, 0.1);
+            border-radius: 10px;
+            border: 2px solid #f5af19;
+        }
+
+        .answer-section h3 {
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+
+        .answer-section input {
+            padding: 15px;
+            font-size: 1.5rem;
+            border: 3px solid #f5af19;
+            border-radius: 8px;
+            text-transform: uppercase;
+            width: 250px;
+            text-align: center;
+            margin-right: 15px;
+        }
+
+        .answer-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f5af19;
+            margin-top: 15px;
+        }
+
+        .modal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            color: #1a1a2e;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+
+        .result-box {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 8px;
+        }
+
+        .result-box.winner {
+            background: rgba(56, 239, 125, 0.2);
+            border: 2px solid #38ef7d;
+        }
+
+        .result-box .word {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .result-box .info {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .result-box .info.valid { color: #11998e; }
+        .result-box .info.invalid { color: #eb3349; }
+
+        .result-box .definition {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+            text-align: left;
+            padding: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 5px;
+        }
+
+        .points-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(79, 172, 254, 0.2);
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .solution-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .solution-box h4 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .solution-step {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .solution-result {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 5px;
+        }
+
+        .solution-result.exact {
+            background: rgba(56, 239, 125, 0.2);
+            color: #0a6b4a;
+        }
+
+        .best-word-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(245, 175, 25, 0.1), rgba(241, 39, 17, 0.1));
+            border: 2px solid #f5af19;
+            border-radius: 10px;
+        }
+
+        .best-word-box h4 {
+            color: #f5af19;
+            margin-bottom: 10px;
+        }
+
+        .best-word-box .best-word {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .conundrum-answer-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(245, 175, 25, 0.1), rgba(241, 39, 17, 0.1));
+            border: 2px solid #f5af19;
+            border-radius: 10px;
+        }
+
+        .conundrum-answer-box h4 {
+            color: #f5af19;
+            margin-bottom: 10px;
+        }
+
+        .conundrum-answer-box .answer-word {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+        }
+
+        .hidden { display: none !important; }
+
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(79, 172, 254, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .instructions h4 {
+            margin-bottom: 8px;
+            color: #4facfe;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            margin-top: 15px;
+            font-size: 1.2rem;
+        }
+
+        .api-status {
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 10px;
+        }
+
+        .api-status.online { color: #38ef7d; }
+        .api-status.offline { color: #f45c43; }
+
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #4facfe;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .sound-toggle:hover {
+            background: rgba(79, 172, 254, 0.3);
+            transform: scale(1.1);
+        }
+
+        .round-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .round-indicator span {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+        }
+
+        .round-indicator span.active {
+            background: #4facfe;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+
+        .round-indicator span.completed {
+            background: #38ef7d;
+            color: #1a1a2e;
+        }
+
+        /* Final results table */
+        .final-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .final-results-table th,
+        .final-results-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .final-results-table th {
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        .final-results-table tr.winner-row {
+            background: rgba(56, 239, 125, 0.2);
+        }
+
+        .final-results-table .rank {
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            .game-content { flex-direction: column; }
+            .game-sidebar { width: 100%; flex-direction: row; justify-content: center; }
+            .player-inputs { flex-direction: column; align-items: center; }
+            .player-input { max-width: 100%; width: 100%; }
+            .tile { width: 45px; height: 55px; font-size: 1.5rem; }
+            .tile.conundrum { width: 40px; height: 50px; font-size: 1.4rem; }
+            .buzz-area { flex-direction: column; gap: 10px; }
+            .buzz-btn { width: 100%; }
+            .sound-toggle { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 1.2rem; }
+            .scoreboard { gap: 8px; }
+            .player-score { padding: 8px 12px; min-width: 80px; }
+            .player-score .score { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
+
+    <div class="container">
+        <h1><span>COUNT</span>DOWN</h1>
+
+        <div class="scoreboard" id="scoreboard">
+            <!-- Dynamic scoreboard will be generated here -->
+        </div>
+
+        <div class="round-indicator hidden" id="roundIndicator">
+            <span id="r1">1. Letters</span>
+            <span id="r2">2. Numbers</span>
+            <span id="r3">3. Conundrum</span>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="menu" class="menu">
+            <h2>Choose Your Game Mode</h2>
+            <div class="menu-buttons">
+                <button class="btn btn-blue" onclick="showSetup('letters')">📝 Letters Round</button>
+                <button class="btn btn-purple" onclick="showSetup('numbers')">🔢 Numbers Round</button>
+                <button class="btn btn-gold" onclick="showSetup('conundrum')">🧩 Conundrum Round</button>
+                <button class="btn btn-green" onclick="showSetup('full')">🎮 Full Game (All 3 Rounds)</button>
+                <button class="btn btn-red" onclick="resetScores()">🔄 Reset Scores</button>
+            </div>
+            <div class="api-status" id="apiStatus">Checking dictionary API...</div>
+        </div>
+
+        <!-- Player Setup Screen -->
+        <div id="setupScreen" class="setup-screen hidden">
+            <h2>👥 Player Setup</h2>
+            
+            <div style="text-align:center; margin-bottom:20px;">
+                <label style="font-weight:bold; font-size:1.1rem;">How many players?</label>
+            </div>
+            
+            <div class="player-count-selector" id="playerCountSelector">
+                <button class="player-count-btn" onclick="setPlayerCount(2)">2</button>
+                <button class="player-count-btn" onclick="setPlayerCount(3)">3</button>
+                <button class="player-count-btn" onclick="setPlayerCount(4)">4</button>
+                <button class="player-count-btn" onclick="setPlayerCount(5)">5</button>
+                <button class="player-count-btn" onclick="setPlayerCount(6)">6</button>
+            </div>
+
+            <div class="player-names-list" id="playerNamesList">
+                <!-- Dynamic player name inputs will be generated here -->
+            </div>
+
+            <div class="setup-buttons">
+                <button class="btn btn-red" onclick="cancelSetup()">Cancel</button>
+                <button class="btn btn-green" onclick="startGameWithPlayers()">Start Game! 🎮</button>
+            </div>
+        </div>
+
+        <!-- Letters Game -->
+        <div id="lettersGame" class="game-board hidden">
+            <div class="game-header">
+                <h2>📝 Letters Round</h2>
+                <div class="timer" id="lettersTimer">30</div>
+            </div>
+            <div class="game-content">
+                <div class="game-main">
+                    <div class="tiles" id="letterTiles"></div>
+                    <div class="status" id="lettersStatus">Click the decks to select 9 letters</div>
+                    
+                    <div id="thinkingDisplay" class="thinking-display hidden">
+                        <h3>⏱️ Thinking Time!</h3>
+                        <p>Find the longest word you can make...</p>
+                    </div>
+                    
+                    <div id="wordInputs" class="input-area hidden">
+                        <h3>⏰ Time's Up! Enter Your Words</h3>
+                        <div class="player-inputs" id="letterPlayerInputs">
+                            <!-- Dynamic player inputs will be generated here -->
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h4>How to Play</h4>
+                        <p>Pick 9 letters. You'll have 30 seconds to think, then declare your words. 2 points per letter!</p>
+                    </div>
+                </div>
+                <div class="game-sidebar" id="letterDecks">
+                    <div class="deck" onclick="pickLetter('consonant')">
+                        <div class="deck-card deck-consonants">
+                            <div class="icon">🔤</div>
+                            <div>CONSONANT</div>
+                        </div>
+                    </div>
+                    <div class="deck" onclick="pickLetter('vowel')">
+                        <div class="deck-card deck-vowels">
+                            <div class="icon">🅰️</div>
+                            <div>VOWEL</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Numbers Game -->
+        <div id="numbersGame" class="game-board hidden">
+            <div class="game-header">
+                <h2>🔢 Numbers Round</h2>
+                <div class="timer" id="numbersTimer">30</div>
+            </div>
+            <div class="game-content">
+                <div class="game-main">
+                    <div class="target-area">
+                        <div class="target-display" id="targetNumber">???</div>
+                        <button class="btn btn-blue" id="generateBtn" onclick="generateTarget()" disabled>Generate Target</button>
+                    </div>
+                    <div class="tiles" id="numberTiles"></div>
+                    <div class="status" id="numbersStatus">Click the decks to select 6 numbers</div>
+                    
+                    <div id="numbersThinkingDisplay" class="thinking-display hidden">
+                        <h3>⏱️ Thinking Time!</h3>
+                        <p>Work out how to reach the target...</p>
+                    </div>
+                    
+                    <div id="answerInputs" class="input-area hidden">
+                        <h3>⏰ Time's Up! Enter Your Answers</h3>
+                        <div class="player-inputs" id="numberPlayerInputs">
+                            <!-- Dynamic player inputs will be generated here -->
+                        </div>
+                    </div>
+                    <div class="instructions">
+                        <h4>How to Play</h4>
+                        <p>Pick 6 numbers. Generate a target (100-999). You have 30 seconds to think, then declare your answers.</p>
+                    </div>
+                </div>
+                <div class="game-sidebar" id="numberDecks">
+                    <div class="deck" onclick="pickNumber('small')">
+                        <div class="deck-card deck-small">
+                            <div class="icon">🔢</div>
+                            <div>SMALL (1-10)</div>
+                        </div>
+                    </div>
+                    <div class="deck" onclick="pickNumber('large')">
+                        <div class="deck-card deck-large">
+                            <div class="icon">💯</div>
+                            <div>LARGE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conundrum Game -->
+        <div id="conundrumGame" class="game-board hidden">
+            <div class="game-header">
+                <h2>🧩 Conundrum - 10 Points!</h2>
+                <div class="timer" id="conundrumTimer">30</div>
+            </div>
+            <div class="conundrum-container">
+                <div class="tiles" id="conundrumTiles"></div>
+                <div class="status" id="conundrumStatus">Press "Start Conundrum" when all players are ready!</div>
+                
+                <button class="btn btn-gold" id="startConundrumBtn" onclick="revealConundrum()" style="font-size:1.3rem;padding:20px 40px;">
+                    🧩 Start Conundrum
+                </button>
+
+                <div id="buzzArea" class="buzz-area hidden">
+                    <!-- Dynamic buzz buttons will be generated here -->
+                </div>
+
+                <div id="answerSection" class="answer-section hidden">
+                    <h3 id="answerPrompt">Player ? - Type your answer!</h3>
+                    <input type="text" id="conundrumInput" maxlength="9" placeholder="Your answer..." autofocus>
+                    <button class="btn btn-green" onclick="submitConundrumAnswer()">Submit</button>
+                    <div class="answer-timer" id="answerTimer">5</div>
+                </div>
+
+                <div class="instructions" style="margin-top:30px;">
+                    <h4>How to Play</h4>
+                    <p>A scrambled 9-letter word will appear. First to buzz in and solve it wins <strong>10 points</strong>! 
+                    You only get one chance - if wrong, others can still try!</p>
+                    <p id="buzzKeyHints"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <div class="loading-text">Checking dictionary...</div>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal-bg hidden">
+            <div class="modal">
+                <h2 id="modalTitle">Results</h2>
+                <div id="modalContent"></div>
+                <button class="btn btn-blue" onclick="closeModal()" style="margin-top:20px;">Continue</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============ AUDIO SYSTEM ============
+var audioCtx = null;
+var soundEnabled = true;
+var countdownInterval = null;
+
+var clockNotes = [
+    { note: 'C4', duration: 0.25 }, { note: 'E4', duration: 0.25 },
+    { note: 'G4', duration: 0.25 }, { note: 'C5', duration: 0.25 },
+    { note: 'G4', duration: 0.25 }, { note: 'E4', duration: 0.25 },
+    { note: 'C4', duration: 0.25 }, { note: 'E4', duration: 0.25 },
+    { note: 'G4', duration: 0.25 }, { note: 'C5', duration: 0.25 },
+    { note: 'B4', duration: 0.25 }, { note: 'G4', duration: 0.25 },
+    { note: 'E4', duration: 0.25 }, { note: 'G4', duration: 0.25 },
+    { note: 'C5', duration: 0.25 }, { note: 'E5', duration: 0.25 }
+];
+
+var noteFrequencies = {
+    'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23,
+    'G4': 392.00, 'A4': 440.00, 'B4': 493.88, 'C5': 523.25,
+    'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99
+};
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+    if (!soundEnabled) stopCountdownMusic();
+}
+
+function playNote(frequency, duration, startTime, volume) {
+    if (!soundEnabled || !audioCtx) return;
+    var oscillator = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.frequency.value = frequency;
+    oscillator.type = 'square';
+    var vol = volume || 0.15;
+    gainNode.gain.setValueAtTime(vol, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration * 0.9);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+}
+
+function playCountdownMusic() {
+    if (!soundEnabled) return;
+    initAudio();
+    var noteIndex = 0;
+    var beatDuration = 0.22;
+    function playNextNote() {
+        if (!soundEnabled) return;
+        var note = clockNotes[noteIndex % clockNotes.length];
+        var freq = noteFrequencies[note.note];
+        playNote(freq, beatDuration * 0.8, audioCtx.currentTime, 0.12);
+        noteIndex++;
+    }
+    playNextNote();
+    countdownInterval = setInterval(playNextNote, beatDuration * 1000);
+}
+
+function playUrgentMusic() {
+    if (!soundEnabled) return;
+    stopCountdownMusic();
+    initAudio();
+    var noteIndex = 0;
+    var beatDuration = 0.15;
+    var urgentNotes = [
+        { note: 'E5', duration: 0.15 }, { note: 'C5', duration: 0.15 },
+        { note: 'E5', duration: 0.15 }, { note: 'G5', duration: 0.15 },
+        { note: 'E5', duration: 0.15 }, { note: 'C5', duration: 0.15 },
+        { note: 'D5', duration: 0.15 }, { note: 'E5', duration: 0.15 }
+    ];
+    function playNextNote() {
+        if (!soundEnabled) return;
+        var note = urgentNotes[noteIndex % urgentNotes.length];
+        var freq = noteFrequencies[note.note];
+        playNote(freq, beatDuration * 0.8, audioCtx.currentTime, 0.18);
+        noteIndex++;
+    }
+    playNextNote();
+    countdownInterval = setInterval(playNextNote, beatDuration * 1000);
+}
+
+function stopCountdownMusic() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+}
+
+function playTimesUp() {
+    if (!soundEnabled) return;
+    initAudio();
+    stopCountdownMusic();
+    var now = audioCtx.currentTime;
+    playNote(523.25, 0.2, now, 0.2);
+    playNote(392.00, 0.2, now + 0.2, 0.2);
+    playNote(329.63, 0.3, now + 0.4, 0.2);
+    playNote(261.63, 0.5, now + 0.7, 0.25);
+}
+
+function playBuzzer() {
+    if (!soundEnabled) return;
+    initAudio();
+    var now = audioCtx.currentTime;
+    playNote(880, 0.1, now, 0.3);
+    playNote(1100, 0.15, now + 0.1, 0.3);
+}
+
+function playCorrect() {
+    if (!soundEnabled) return;
+    initAudio();
+    var now = audioCtx.currentTime;
+    playNote(523.25, 0.15, now, 0.2);
+    playNote(659.25, 0.15, now + 0.15, 0.2);
+    playNote(783.99, 0.3, now + 0.3, 0.25);
+}
+
+function playWrong() {
+    if (!soundEnabled) return;
+    initAudio();
+    var now = audioCtx.currentTime;
+    playNote(200, 0.3, now, 0.2);
+    playNote(150, 0.4, now + 0.3, 0.2);
+}
+
+// ============ PLAYER SYSTEM ============
+var players = [];
+var playerColors = ['#4facfe', '#f093fb', '#38ef7d', '#f5af19', '#eb3349', '#667eea'];
+var pendingGameMode = null;
+var selectedPlayerCount = 2;
+
+function showSetup(gameMode) {
+    pendingGameMode = gameMode;
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('setupScreen').classList.remove('hidden');
+    
+    // If we already have players, keep the count
+    if (players.length > 0) {
+        setPlayerCount(players.length);
+    } else {
+        setPlayerCount(2);
+    }
+}
+
+function setPlayerCount(count) {
+    selectedPlayerCount = count;
+    
+    // Update button states
+    document.querySelectorAll('.player-count-btn').forEach(function(btn) {
+        btn.classList.remove('selected');
+        if (parseInt(btn.textContent) === count) {
+            btn.classList.add('selected');
+        }
+    });
+    
+    // Generate name inputs
+    var list = document.getElementById('playerNamesList');
+    list.innerHTML = '';
+    
+    for (var i = 0; i < count; i++) {
+        var existingName = (players[i] && players[i].name) ? players[i].name : '';
+        var div = document.createElement('div');
+        div.className = 'player-name-input';
+        div.innerHTML = '<div class="player-number" style="background:' + playerColors[i] + ';">' + (i + 1) + '</div>' +
+            '<input type="text" id="playerName' + i + '" placeholder="Player ' + (i + 1) + ' name" value="' + existingName + '" maxlength="15">';
+        list.appendChild(div);
+    }
+}
+
+function cancelSetup() {
+    document.getElementById('setupScreen').classList.add('hidden');
+    document.getElementById('menu').classList.remove('hidden');
+    document.getElementById('menu').style.display = 'block';
+    pendingGameMode = null;
+}
+
+function startGameWithPlayers() {
+    // Gather player names
+    players = [];
+    for (var i = 0; i < selectedPlayerCount; i++) {
+        var nameInput = document.getElementById('playerName' + i);
+        var name = nameInput.value.trim() || 'Player ' + (i + 1);
+        players.push({
+            name: name,
+            score: 0,
+            color: playerColors[i]
+        });
+    }
+    
+    // Update scoreboard
+    updateScoreboard();
+    
+    // Hide setup, start game
+    document.getElementById('setupScreen').classList.add('hidden');
+    
+    if (pendingGameMode === 'letters') {
+        startLettersGame();
+    } else if (pendingGameMode === 'numbers') {
+        startNumbersGame();
+    } else if (pendingGameMode === 'conundrum') {
+        startConundrumGame();
+    } else if (pendingGameMode === 'full') {
+        startFullGame();
+    }
+}
+
+function updateScoreboard() {
+    var sb = document.getElementById('scoreboard');
+    sb.innerHTML = '';
+    for (var i = 0; i < players.length; i++) {
+        var div = document.createElement('div');
+        div.className = 'player-score';
+        div.style.borderColor = players[i].color;
+        div.innerHTML = '<h3 title="' + players[i].name + '">' + players[i].name + '</h3>' +
+            '<div class="score" id="score' + i + '" style="color:' + players[i].color + ';">' + players[i].score + '</div>';
+        sb.appendChild(div);
+    }
+}
+
+function updateScores() {
+    for (var i = 0; i < players.length; i++) {
+        var scoreEl = document.getElementById('score' + i);
+        if (scoreEl) scoreEl.textContent = players[i].score;
+    }
+}
+
+// ============ WORD LIST FOR BEST WORD FINDER ============
+var wordList = [
+    'WONDERFUL', 'BEAUTIFUL', 'SOMETHING', 'DIFFERENT', 'IMPORTANT', 'AMERICANS', 'CHRISTMAS', 'COUNTRIES',
+    'COMMUNITY', 'INCLUDING', 'QUESTIONS', 'PRESIDENT', 'ATTENTION', 'FOLLOWING', 'SOMETIMES', 'EDUCATION',
+    'PUBLISHED', 'COMPANIES', 'SEPTEMBER', 'POLITICAL', 'ACCORDING', 'CONTINUED', 'DESCRIBED', 'TREATMENT',
+    'YESTERDAY', 'KNOWLEDGE', 'SITUATION', 'THEREFORE', 'AFTERNOON', 'CERTAINLY', 'TELEPHONE', 'ADVANTAGE',
+    'BEGINNING', 'COMMITTEE', 'CONDITION', 'CONCERNED', 'DANGEROUS', 'DETERMINE', 'DEVELOPED', 'DIFFICULT',
+    'DIRECTION', 'DISCOVERY', 'EFFECTIVE', 'ELIZABETH', 'EXCELLENT', 'EXECUTIVE', 'EXISTENCE', 'EXPENSIVE',
+    'EXPLAINED', 'EXTREMELY', 'FACTORIES', 'HAPPENING', 'IMMEDIATE', 'INCREASED', 'INDICATED', 'INFLUENCE',
+    'INSURANCE', 'INTRODUCE', 'LISTENING', 'MENTIONED', 'NECESSARY', 'OPERATING', 'OPERATION', 'ORGANIZED',
+    'OTHERWISE', 'OURSELVES', 'PARAGRAPH', 'PERFECTLY', 'PERFORMED', 'PERMANENT', 'PERSONNEL', 'PRESENTED',
+    'PRIMARILY', 'PRINCIPAL', 'PRINCIPLE', 'PRISONERS', 'PRODUCERS', 'PROFESSOR', 'PROGRAMME', 'PUBLISHED',
+    'PURCHASED', 'REASONING', 'RECEIVING', 'RECOGNIZE', 'RECOMMEND', 'RECORDING', 'REFERENCE', 'RELATIONS',
+    'RELIGIOUS', 'REMAINING', 'REPORTING', 'REPRESENT', 'REQUESTED', 'RESOURCES', 'RESPECTED', 'RESULTING',
+    'SATISFIED', 'SCIENTIST', 'SECONDARY', 'SECRETARY', 'SELECTION', 'SENSITIVE', 'SERIOUSLY', 'SHOULDERS',
+    'SPIRITUAL', 'STANDARDS', 'STATEMENT', 'STEPHANIE', 'STRUCTURE', 'SUCCEEDED', 'SUFFERING', 'SUGGESTED',
+    'SUPPORTED', 'SURPRISED', 'TECHNICAL', 'TECHNIQUE', 'TEMPORARY', 'THOUSANDS', 'TRADITION', 'TRANSPORT',
+    'TYPICALLY', 'WONDERING', 'WORKPLACE', 'OVERNIGHT', 'STREAMING', 'ADVENTURE', 'ALGORITHM',
+    'ABSOLUTE', 'ACCEPTED', 'ACCIDENT', 'ACHIEVED', 'ACQUIRED', 'ACTIVITY', 'ACTUALLY', 'ADDITION',
+    'ADEQUATE', 'ADJUSTED', 'ADMITTED', 'ADVANCED', 'AFFECTED', 'AGENCIES', 'ALTHOUGH', 'ANALYSIS',
+    'ANNOUNCE', 'ANYTHING', 'ANYWHERE', 'APPARENT', 'APPEARED', 'APPLYING', 'APPROACH', 'APPROVED',
+    'ARGUMENT', 'ARRANGED', 'ARTICLES', 'ASSEMBLY', 'ASSESSED', 'ASSIGNED', 'ASSUMING', 'ATTACHED',
+    'ATTACKED', 'ATTEMPTS', 'ATTENDED', 'ATTITUDE', 'ATTORNEY', 'AUDIENCE', 'BACHELOR', 'BACKWARD',
+    'BALANCED', 'BASEBALL', 'BECOMING', 'BELIEVED', 'BENEFITS', 'BIRTHDAY', 'BLANKETS', 'BLOCKING',
+    'BORROWED', 'BREAKING', 'BRINGING', 'BROTHERS', 'BUILDING', 'BULLETIN', 'BUSINESS', 'CALENDAR',
+    'CAMPAIGN', 'CAPACITY', 'CAPTURED', 'CATEGORY', 'CENTERED', 'CHAIRMAN', 'CHAMBERS', 'CHAMPION',
+    'CHANGING', 'CHANNELS', 'CHAPTERS', 'CHARGING', 'CHECKING', 'CHEMICAL', 'CHILDREN', 'CHURCHES',
+    'CIRCUITS', 'CLAIMING', 'CLEANING', 'CLEARING', 'CLICKING', 'CLIMBING', 'CLINICAL', 'CLOTHING',
+    'COACHING', 'COLLAPSE', 'COLLEGES', 'COLONIAL', 'COMBINED', 'COMMANDS', 'COMMENTS', 'COMMERCE',
+    'COMMUNAL', 'COMPARED', 'COMPLETE', 'COMPOSED', 'COMPOUND', 'COMPUTER', 'CONCEPTS', 'CONCERNS',
+    'CONCLUDE', 'CONCRETE', 'CONFLICT', 'CONFUSED', 'CONGRESS', 'CONNECTS', 'CONSIDER', 'CONSISTS',
+    'CONSTANT', 'CONSUMER', 'CONTACTS', 'CONTAINS', 'CONTENTS', 'CONTEXTS', 'CONTINUE', 'CONTRACT',
+    'CONTRARY', 'CONTRAST', 'CONTROLS', 'CONVERTS', 'CONVINCE', 'CREATING', 'CREATION', 'CREATIVE',
+    'CREATURE', 'CRIMINAL', 'CRITICAL', 'CROSSING', 'CULTURAL', 'CURRENCY', 'CUSTOMER', 'DATABASE',
+    'DAUGHTER', 'DAYLIGHT', 'DEADLINE', 'DEALINGS', 'DECEMBER', 'DECIDING', 'DECISION', 'DECLARED',
+    'DECLINED', 'DECREASE', 'DEFEATED', 'DEFINING', 'DEFINITE', 'DELICATE', 'DEMANDED', 'DEMOCRAT',
+    'DESCRIBE', 'DESIGNED', 'DESIGNER', 'DETAILED', 'DETECTED', 'DEVELOPS', 'DIABETES', 'DIALOGUE',
+    'DIAMONDS', 'DIAMETER', 'DIRECTED', 'DIRECTOR', 'DISABLED', 'DISASTER', 'DISCOUNT', 'DISCOVER',
+    'DISCRETE', 'DISEASES', 'DISORDER', 'DISPATCH', 'DISPLAYS', 'DISPOSAL', 'DISPOSED', 'DISPUTED',
+    'DISTANCE', 'DISTINCT', 'DISTRESS', 'DISTRICT', 'DIVIDEND', 'DIVISION', 'DOCTRINE', 'DOCUMENT',
+    'DOMESTIC', 'DOMINANT', 'DOMINATE', 'DONATION', 'DOUBLING', 'DOWNLOAD', 'DOWNTOWN', 'DRAFTING',
+    'DRAMATIC', 'DREAMING', 'DRINKING', 'DROPPING', 'DURATION', 'DWELLING', 'DYNAMICS', 'EARLIEST',
+    'EARNINGS', 'ECONOMIC', 'EDUCATED', 'EFFICACY', 'EIGHTEEN', 'ELECTION', 'ELECTRIC', 'ELECTRON',
+    'ELEMENTS', 'ELEVATED', 'EMBARKED', 'EMBEDDED', 'EMBRACED', 'EMERGING', 'EMISSION', 'EMOTIONS',
+    'EMPHASIS', 'EMPLOYED', 'EMPLOYEE', 'EMPLOYER', 'ENABLING', 'ENCODING', 'ENORMOUS', 'ENSURING',
+    'ENTERING', 'ENTIRELY', 'ENTITLED', 'ENTRANCE', 'ENVELOPE', 'EQUALITY', 'EQUATION', 'EQUIPPED',
+    'ESCAPING', 'ESTIMATE', 'ETERNITY', 'EUROPEAN', 'EVALUATE', 'EVENINGS', 'EVENTUAL', 'EVERYDAY',
+    'EVERYONE', 'EVIDENCE', 'EXAMPLES', 'EXCHANGE', 'EXCITING', 'EXCLUDED', 'EXECUTED', 'EXERCISE',
+    'EXHIBITS', 'EXISTING', 'EXPANDED', 'EXPECTED', 'EXPENSES', 'EXPLAINS', 'EXPLICIT', 'EXPLORED',
+    'EXPORTED', 'EXPOSURE', 'EXTENDED', 'EXTERNAL', 'EXTRACTS', 'EXTREMES', 'FABULOUS', 'FACEBOOK',
+    'FACILITY', 'FAILURES', 'FAIRNESS', 'FAITHFUL', 'FAMILIES', 'FAMILIAR', 'FAMOUSLY', 'FEATURED',
+    'FEATURES', 'FEBRUARY', 'FEEDBACK', 'FEELINGS', 'FESTIVAL', 'FIELDING', 'FIGHTING', 'FILTERED',
+    'FINALIST', 'FINANCED', 'FINANCES', 'FINDINGS', 'FINISHED', 'FIREARMS', 'FLAGSHIP', 'FLASHING',
+    'FLEXIBLE', 'FLOATING', 'FLOODING', 'FLORENCE', 'FLOURISH', 'FOLLOWED', 'FOLLOWER', 'FOOTBALL',
+    'FOOTWEAR', 'FORECAST', 'FOREMOST', 'FORENSIC', 'FORMERLY', 'FORMULAS', 'FORTRESS', 'FORWARDS',
+    'FOSTERED', 'FOUNDERS', 'FOUNDING', 'FOURTEEN', 'FRACTION', 'FRAGMENT', 'FRANKLIN', 'FREQUENT',
+    'FRIENDLY', 'FRONTIER', 'FRUITFUL', 'FUNCTION', 'FUNERALS', 'GAMBLING', 'GATHERED', 'GENERATE',
+    'GENEROUS', 'GEOMETRY', 'GIGANTIC', 'GLOBALLY', 'GOODNESS', 'GOVERNED', 'GOVERNOR', 'GRACEFUL',
+    'GRADIENT', 'GRADUATE', 'GRAPHICS', 'GRASPING', 'GRATEFUL', 'GREATEST', 'GRIPPING', 'GROUNDED',
+    'GROUPING', 'GUARDIAN', 'GUARDING', 'GUIDANCE', 'HANDLING', 'HANDSOME', 'HAPPENED', 'HAPPIEST',
+    'HARDENED', 'HARDWARE', 'HARMLESS', 'HARMONIC', 'HEADLINE', 'HEARINGS', 'HEARTILY', 'HEAVENLY',
+    'HERITAGE', 'HIGHLAND', 'HIGHWAYS', 'HISTORIC', 'HOLDINGS', 'HOLIDAYS', 'HOMELAND', 'HOMELESS',
+    'HOMEPAGE', 'HOMEWORK', 'HONESTLY', 'HONORARY', 'HOPELESS', 'HORIZONS', 'HORMONES', 'HOSPITAL',
+    'HOSTAGES', 'HOUSINGS', 'HUMANITY', 'HUNDREDS', 'HYDROGEN', 'HYSTERIA', 'IDENTIFY', 'IDENTITY',
+    'IGNORANT', 'IGNORING', 'ILLINOIS', 'IMAGINED', 'IMITATED', 'IMMATURE', 'IMMERSED', 'IMPERIAL',
+    'IMPLICIT', 'IMPLYING', 'IMPORTED', 'IMPOSING', 'IMPROVED', 'INACTIVE', 'INCIDENT', 'INCLUDED',
+    'INCOMING', 'INCREASE', 'INCURRED', 'INDEXING', 'INDICATE', 'INDIRECT', 'INDUCING', 'INDUSTRY',
+    'INFANTRY', 'INFECTED', 'INFERIOR', 'INFINITE', 'INFLATED', 'INFORMED', 'INFRARED', 'INHERENT',
+    'INITIALS', 'INJECTED', 'INJURIES', 'INNOCENT', 'INNOVATE', 'INSPIRED', 'INSPIRES', 'INSTANCE',
+    'INSTINCT', 'INTENDED', 'INTERACT', 'INTEREST', 'INTERIOR', 'INTERNAL', 'INTERNET', 'INTERVAL',
+    'INTIMATE', 'INVENTED', 'INVENTOR', 'INVESTED', 'INVESTOR', 'INVOKING', 'INVOLVED', 'INVOLVES',
+    'IRONICAL', 'ISOLATED', 'JAPANESE', 'JEALOUSY', 'JONATHAN', 'JOURNALS', 'JOURNEYS', 'JUDGMENT',
+    'JUDICIAL', 'JUNCTION', 'JUVENILE', 'KEYBOARD', 'KINDNESS', 'KINGDOMS', 'KNIGHTED', 'KNITTING',
+    'KNOCKING', 'LABELLED', 'LABOURED', 'LANDMARK', 'LANDLORD', 'LANGUAGE', 'LAUGHING', 'LAUGHTER',
+    'LAUNCHED', 'LAUNCHER', 'LAYERING', 'LEARNING', 'LECTURES', 'LEFTOVER', 'LEGACIES', 'LEGALITY',
+    'LEISURES', 'LETTERED', 'LEVERAGE', 'LIBERALS', 'LIBERATE', 'LICENSED', 'LIFELESS', 'LIFELIKE',
+    'LIFESPAN', 'LIFETIME', 'LIGHTING', 'LIKEWISE', 'LIMITING', 'LINEAGES', 'LINGERED', 'LISTINGS',
+    'LITERACY', 'LITERARY', 'LITERATE', 'LIVELONG', 'LOADINGS', 'LOBBYING', 'LOBBYIST', 'LOCALITY',
+    'LOCATING', 'LOCATION', 'LOCKDOWN', 'LODGINGS', 'LOGISTIC', 'LONESOME', 'LONGTERM', 'LONGTIME',
+    'LOOPHOLE', 'LORDSHIP', 'MACHINES', 'MAGAZINE', 'MAGNETIC', 'MAINTAIN', 'MAJORITY', 'MANAGING',
+    'MANIFEST', 'MANKIND', 'MANSIONS', 'MARATHON', 'MARGINAL', 'MARRIAGE', 'MATERIAL', 'MATERNAL',
+    'MEASURED', 'MECHANIC', 'MEDIEVAL', 'MEETINGS', 'MEMBRANE', 'MEMORIAL', 'MEMORIES', 'MENTIONS',
+    'MERCHANT', 'MESSAGES', 'METAPHOR', 'MIDNIGHT', 'MILITARY', 'MILLIONS', 'MINERALS', 'MINIMIZE',
+    'MINISTER', 'MINISTRY', 'MINORITY', 'MIRACLES', 'MISMATCH', 'MISSILES', 'MISSIONS', 'MISTAKES',
+    'MODERATE', 'MODIFIED', 'MOISTURE', 'MOLECULE', 'MOMENTUM', 'MONETARY', 'MONSTERS', 'MONUMENT',
+    'MORALITY', 'MORTGAGE', 'MOTHERED', 'MOTIONED', 'MOTIVATE', 'MOUNTING', 'MOVEMENT', 'MULTIPLE',
+    'MURDERED', 'MURDERER', 'MUSHROOM', 'MUSICIAN', 'MUTUALLY', 'MYSTERIO', 'NATIONAL', 'NEGATIVE',
+    'NEIGHBOR', 'NETWORKS', 'NEWFOUND', 'NOBILITY', 'NOMINATE', 'NONSENSE', 'NORMALLY', 'NORTHERN',
+    'NOSTALGI', 'NOTICING', 'NOVEMBER', 'NOWADAYS', 'NUMBERED', 'NUMEROUS', 'NUTRIENT', 'OBTAINED',
+    'OCCASION', 'OCCUPIED', 'OCCURRED', 'OFFERING', 'OFFICERS', 'OFFICIAL', 'OFFSHORE', 'OPERATED',
+    'OPERATOR', 'OPINIONS', 'OPPONENT', 'OPPOSITE', 'OPTIMISM', 'OPTIONAL', 'ORGANISM', 'ORGANIZE',
+    'ORIENTAL', 'ORIENTED', 'ORIGINAL', 'OUTBREAK', 'OUTCOMES', 'OUTDOORS', 'OUTLINED', 'OUTLINES',
+    'OUTLOOKS', 'OUTREACH', 'OUTSIDER', 'OVERCOME', 'OVERHEAD', 'OVERLOOK', 'OVERSEAS', 'OVERVIEW',
+    'PACKAGES', 'PAINTING', 'PARALLEL', 'PARENTAL', 'PARISHES', 'PARKLAND', 'PARTICLE', 'PARTISAN',
+    'PARTNERS', 'PASSAGES', 'PASSIONS', 'PASTORAL', 'PATENTED', 'PATHWAYS', 'PATIENCE', 'PATIENTS',
+    'PATTERNS', 'PAVEMENT', 'PAYMENTS', 'PEACEFUL', 'PEASANTS', 'PECULIAR', 'PEDAGOGY', 'PENALIZE',
+    'PENDULUM', 'PENSIONS', 'PENTAGON', 'PERCEIVE', 'PERFORCE', 'PERFORMS', 'PERIODIC', 'PERISHED',
+    'PERSISTS', 'PERSONAL', 'PERSUADE', 'PETITION', 'PHARMACY', 'PHILLIPS', 'PHONETIC', 'PHYSICAL',
+    'PICKLING', 'PICTURES', 'PILGRIMS', 'PIPELINE', 'PITCHING', 'PLACARDS', 'PLACEBOS', 'PLACEMEN',
+    'PLANNERS', 'PLANNING', 'PLASTICS', 'PLATFORM', 'PLATINUM', 'PLAYBACK', 'PLEASANT', 'PLEASING',
+    'PLEASURE', 'PLUNGING', 'POINTERS', 'POINTING', 'POLISHED', 'POLITELY', 'POLITICS', 'POLLUTED',
+    'POPULACE', 'POPULARI', 'POPULATE', 'PORTABLE', 'PORTIONS', 'PORTRAIT', 'PORTUGAL', 'POSITION',
+    'POSITIVE', 'POSSIBLE', 'POSSIBLY', 'POSTCARD', 'POSTPONE', 'POTATOES', 'POWERFUL', 'PRACTICE',
+    'PRECIOUS', 'PREDATOR', 'PREDICTS', 'PREFACES', 'PREGNANT', 'PREJUDIC', 'PREMISES', 'PREMIUMS',
+    'PREPARED', 'PRESENCE', 'PRESENTS', 'PRESERVE', 'PRESSING', 'PRESSURE', 'PRESTIGE', 'PRETENDS',
+    'PRETTIFY', 'PREVENTS', 'PREVIOUS', 'PRIESTLY', 'PRIMEVAL', 'PRINCESS', 'PRINTING', 'PRIORITY',
+    'PRISONER', 'PROBABLE', 'PROBABLY', 'PROBLEMS', 'PROCEEDS', 'PROCLAIM', 'PRODUCED', 'PRODUCER',
+    'PRODUCES', 'PRODUCTS', 'PROFILES', 'PROGRESS', 'PROJECTS', 'PROLOGUE', 'PROMISED', 'PROMOTES',
+    'PROMPTLY', 'PRONOUNS', 'PROPOSES', 'PROSPECT', 'PROSPERS', 'PROTESTS', 'PROTOCOL', 'PROVIDED',
+    'PROVIDER', 'PROVIDES', 'PROVINCE', 'PROVOKED', 'PUBLICLY', 'PUNISHED', 'PURCHASE', 'PURPOSES',
+    'PURSUING', 'PURSUITS', 'PUZZLING', 'PYRAMIDS', 'QUADRANT', 'QUALIFIE', 'QUARTERS', 'QUERYING',
+    'QUESTION', 'RADICALS', 'RAILINGS', 'RAILROAD', 'RAILWAYS', 'RAINFALL', 'RANDOMLY', 'RANKINGS',
+    'RATIONAL', 'REACHING', 'REACTING', 'REACTION', 'READINGS', 'REALISTS', 'REALIZED', 'REALTIME',
+    'REASONED', 'REASSURE', 'REBELLED', 'RECALLED', 'RECEIPTS', 'RECEIVED', 'RECEIVER', 'RECEIVES',
+    'RECENTLY', 'RECESSES', 'RECEPTOR', 'RECKLESS', 'RECKONED', 'RECLAIME', 'RECORDED', 'RECORDER',
+    'RECOURSE', 'RECOVERY', 'RECREATE', 'RECRUITS', 'REDDENED', 'REDESIGN', 'REDIRECT', 'REDISCOV',
+    'REDUCING', 'REELECTS', 'REFERRED', 'REFERRAL', 'REFINERY', 'REFLECTS', 'REFLEXES', 'REFORMED',
+    'REFORMER', 'REFUGEES', 'REFUSING', 'REGAINED', 'REGARDED', 'REGIMENT', 'REGIONAL', 'REGISTER',
+    'REGISTRY', 'REGULATE', 'REHEARSE', 'REINVENT', 'REJECTED', 'RELATING', 'RELATION', 'RELATIVE',
+    'RELAXING', 'RELEASED', 'RELEASES', 'RELEVANT', 'RELIABLE', 'RELIEVED', 'RELIGION', 'RELISHED',
+    'RELOCATE', 'REMAINED', 'REMEDIES', 'REMEMBER', 'REMINDED', 'REMOTELY', 'REMOVING', 'RENOWNED',
+    'RENSURED', 'REOPENED', 'REPAIRED', 'REPEALED', 'REPEATED', 'REPLACED', 'REPLACES', 'REPLICAS',
+    'REPLYING', 'REPORTED', 'REPORTER', 'REPUBLIC', 'REQUESTS', 'REQUIRED', 'REQUIRES', 'RESEARCH',
+    'RESEMBLE', 'RESERVED', 'RESERVES', 'RESETTLE', 'RESIDENT', 'RESIDUAL', 'RESIGNED', 'RESISTED',
+    'RESOLVED', 'RESOURCE', 'RESPONDS', 'RESPONSE', 'RESTLESS', 'RESTORED', 'RESTRAIN', 'RESTRICT',
+    'RESULTED', 'RESURFAC', 'RETAILER', 'RETAINED', 'RETAINER', 'RETIRING', 'RETRIEVE', 'RETURNED',
+    'REVEALED', 'REVENUES', 'REVEREND', 'REVERSED', 'REVIEWED', 'REVIEWER', 'REVISING', 'REVISION',
+    'REVIVALS', 'REVOLTED', 'RHETORIC', 'RICHARDS', 'RICHNESS', 'RIDICULE', 'RIGOROUS', 'RIPENING',
+    'ROBOTICS', 'ROCKETED', 'ROMANIAN', 'ROMANTIC', 'ROOFTOPS', 'ROOMMATE', 'ROTATING', 'ROTATION',
+    'ROUTINES', 'ROYALIST', 'RUBBINGS', 'RUCKSACK', 'RUEFULLY', 'RUMBLINGS', 'RUNNINGS', 'RUSTLING',
+    'SABOTAGE', 'SACRAMEN', 'SADISTIC', 'SAFETYED', 'SAILBOAT', 'SAMPLING', 'SANCTION', 'SANDWICH',
+    'SANITARY', 'SATURDAY', 'SAVORING', 'SCAFFOLD', 'SCALABLE', 'SCANDALS', 'SCANNING', 'SCARCELY',
+    'SCATTERS', 'SCENARIO', 'SCHEDULE', 'SCHOLARS', 'SCIENCES', 'SCISSORS', 'SCOTLAND', 'SCOUTING',
+    'SCRAMBLE', 'SCREAMED', 'SCREENED', 'SCRUTINY', 'SCULPTOR', 'SEAMLESS', 'SEARCHED', 'SEARCHES',
+    'SEASONAL', 'SEASONED', 'SEAWATER', 'SECLUDED', 'SECONDED', 'SECONDLY', 'SECTIONS', 'SECURING',
+    'SECURITY', 'SEDIMENT', 'SEGMENTS', 'SELECTED', 'SELECTOR', 'SEMANTIC', 'SEMESTER', 'SENATORS',
+    'SENSIBLE', 'SENTENCE', 'SEPARATE', 'SEQUENCE', 'SERENITY', 'SERGEANT', 'SERVANTS', 'SERVICES',
+    'SESSIONS', 'SETTINGS', 'SETTLERS', 'SETTLING', 'SEVERITY', 'SEXUALLY', 'SHADOWED', 'SHANGHAI',
+    'SHARPEST', 'SHELLING', 'SHELTERS', 'SHERIFFS', 'SHIFTING', 'SHIPMENT', 'SHIPPING', 'SHOCKING',
+    'SHOOTERS', 'SHOOTING', 'SHOPPING', 'SHORTAGE', 'SHORTEST', 'SHORTCUT', 'SHOULDER', 'SHOUTING',
+    'SHOWDOWN', 'SHUTTERS', 'SIBLINGS', 'SICKNESS', 'SIDEWALK', 'SIGNINGS', 'SILENCED', 'SILENTLY',
+    'SIMULATE', 'SINGULAR', 'SITUATED', 'SKELETAL', 'SKELETON', 'SKETCHES', 'SKILLFUL', 'SKINNING',
+    'SKIPPING', 'SLASHING', 'SLAPPING', 'SLASHING', 'SLEEPING', 'SLIGHTES', 'SLIPPING', 'SLIPPING',
+    'SMALLEST', 'SMARTEST', 'SMASHING', 'SMELLING', 'SMOOTHER', 'SMOOTHLY', 'SNAPPING', 'SNAPSHOT',
+    'SNOWFALL', 'SOCIALLY', 'SOCIETAL', 'SOCIOLOG', 'SOFTWARE', 'SOLDIERS', 'SOLEMNLY', 'SOLIDARI',
+    'SOLUTION', 'SOMEBODY', 'SOMETIME', 'SOMEWHAT', 'SONGHFUL', 'SOOTHING', 'SORCERER', 'SORENESS',
+    'SOUTHERN', 'SOUVENIR', 'SPANNING', 'SPARKING', 'SPARKLED', 'SPEAKERS', 'SPEAKING', 'SPECIALS',
+    'SPECIFIC', 'SPECIMEN', 'SPECTRAL', 'SPECTRUM', 'SPEECHES', 'SPEEDILY', 'SPEEDING', 'SPELLING',
+    'SPENDING', 'SPHERING', 'SPILLAGE', 'SPINNING', 'SPIRITED', 'SPLASHED', 'SPLENDID', 'SPLINTER',
+    'SPLITTING', 'SPOKESMEN', 'SPONSORS', 'SPORTING', 'SPOTTING', 'SPRAWLED', 'SPRAWLIN', 'SPREADIN',
+    'SPRINGS', 'SPRINKLE', 'SPURRING', 'SQUARELY', 'SQUEEZED', 'STABBING', 'STABLING', 'STAFFING',
+    'STAGGERS', 'STAINING', 'STAIRWAY', 'STALLING', 'STAMPING', 'STANDARD', 'STANDING', 'STANDOUT',
+    'STARLING', 'STARTING', 'STARTLED', 'STARVING', 'STATIONS', 'STATISTI', 'STATUTES', 'STEADILY',
+    'STEALING', 'STEAMING', 'STEERING', 'STEPPING', 'STERLING', 'STICKING', 'STILLNES', 'STIMULUS',
+    'STINGING', 'STIRRING', 'STITCHES', 'STOCKPIL', 'STOPPING', 'STORAGES', 'STORMING', 'STRAIGHT',
+    'STRAINED', 'STRANDED', 'STRANGER', 'STRATEGI', 'STREAKED', 'STREAMER', 'STRENGTH', 'STRESSED',
+    'STRESSES', 'STRETCHE', 'STRICTLY', 'STRIKERS', 'STRIKING', 'STRINGED', 'STRIPPED', 'STRIVING',
+    'STROLLED', 'STRONGER', 'STRONGLY', 'STRUGGLE', 'STUBBORN', 'STUDENTS', 'STUDYING', 'STUFFING',
+    'STUMBLED', 'STUNNING', 'SUBJECTS', 'SUBMERGE', 'SUBMITTE', 'SUBSIDED', 'SUBSIDIE', 'SUBSTANC',
+    'SUBSTITU', 'SUBURBAN', 'SUCCEEDE', 'SUCCESSE', 'SUCCESOR', 'SUDDENLY', 'SUFFERED', 'SUFFERIN',
+    'SUFFICEI', 'SUGGESTS', 'SUITABLE', 'SUITCASE', 'SUMMARIE', 'SUMMONED', 'SUNLIGHT', 'SUNSHINE',
+    'SUPERB', 'SUPERIOR', 'SUPPLEME', 'SUPPLIED', 'SUPPLIER', 'SUPPLIES', 'SUPPORTS', 'SUPPOSED',
+    'SUPPRESS', 'SURGEONS', 'SURGICAL', 'SURNAMES', 'SURROUND', 'SURVEYED', 'SURVIVED', 'SURVIVOR',
+    'SUSPECTS', 'SUSPENDE', 'SUSPENSE', 'SUSPICIO', 'SUSTAINE', 'SWAPPING', 'SWEEPING', 'SWITCHES',
+    'SYMBOLIC', 'SYMMETRI', 'SYMPATHY', 'SYMPHONY', 'SYMPTOMS', 'SYNDROME', 'SYNOPSIS', 'SYSTEMIC',
+    'TABLETOP', 'TACKLING', 'TACTICAL', 'TAILORED', 'TAKEAWAY', 'TAKEOVER', 'TALENTED', 'TANGIBLE',
+    'TARGETED', 'TEACHING', 'TEAMMATE', 'TEAMWORK', 'TECHNICA', 'TEENAGER', 'TEMPORAL', 'TENDENCY',
+    'TENSIONS', 'TERMINAL', 'TERRACED', 'TERRIBLE', 'TERRIBLY', 'TERRIFIE', 'TERRITOR', 'TESTIFIE',
+    'TEXTURES', 'THANKFUL', 'THANKSTO', 'THEATERS', 'THEATRIC', 'THEMATIC', 'THEORETI', 'THEREPSY',
+    'THINKING', 'THIRTEEN', 'THOROUGH', 'THOUGHTS', 'THREATEN', 'THRILLER', 'THRIVING', 'THROTTLE',
+    'THROWING', 'THURSDAY', 'TIGHTENE', 'TIMELINE', 'TITANIUM', 'TOGETHER', 'TOLERANT', 'TOLERATE',
+    'TOMORROW', 'TONGUING', 'TONIGHTS', 'TOPOLOGY', 'TORNADOE', 'TORTOISE', 'TORTURED', 'TOTALING',
+    'TOTALLED', 'TOUCHING', 'TOUGHEST', 'TOURISTS', 'TOURNEYS', 'TOWNSHIP', 'TRACKING', 'TRACTION',
+    'TRADABLE', 'TRAILERS', 'TRAILING', 'TRAINING', 'TRAMPLED', 'TRANSACT', 'TRANSFER', 'TRANSFOR',
+    'TRANSIEN', 'TRANSITN', 'TRANSMIT', 'TRANSPOR', 'TRAUMATI', 'TRAVELED', 'TRAVELER', 'TREASURE',
+    'TREATIES', 'TREATING', 'TREATMEN', 'TRENCHES', 'TRENDING', 'TRIANGLE', 'TRIBUNAL', 'TRIBUTES',
+    'TRICKING', 'TRIGGERS', 'TRILLION', 'TRIMMING', 'TRIPLING', 'TRIUMPHS', 'TROPICAL', 'TROUBLED',
+    'TROUBLES', 'TROUSERS', 'TRUCKING', 'TRUSTING', 'TRUTHFUL', 'TUMBLING', 'TUNISIAN', 'TUNNELED',
+    'TURBINES', 'TURNOUTS', 'TURNOVER', 'TUTORIAL', 'TWILIGHT', 'TWISTING', 'TYPEFACE', 'TYPHOONS',
+    'ULTERIOR', 'ULTIMATE', 'UMBRELLA', 'UNBEATEN', 'UNBIASED', 'UNBROKEN', 'UNCOMMON', 'UNCOVERED',
+    'UNDERCUT', 'UNDERDOG', 'UNDERLIE', 'UNDERPIN', 'UNDERWAY', 'UNEARNED', 'UNEARTHED', 'UNENDING',
+    'UNEVENLY', 'UNEXPECT', 'UNFAIRLY', 'UNFOLDED', 'UNFORGIV', 'UNHAPPPY', 'UNICYCLE', 'UNIFORMS',
+    'UNIQUELY', 'UNIVERSE', 'UNLAWFUL', 'UNLEADED', 'UNLIKELY', 'UNLISTED', 'UNLOCKED', 'UNMANNED',
+    'UNNERVED', 'UNOPENED', 'UNPACKED', 'UNSIGNED', 'UNSTABLE', 'UNSUITED', 'UNTITLED', 'UNTOUCHE',
+    'UNUSABLE', 'UNUSUALY', 'UNVEILED', 'UNWANTED', 'UPBRINGN', 'UPCOMING', 'UPDATING', 'UPGRADED',
+    'UPHEAVAL', 'UPRISING', 'UPSTAIRS', 'UPSTREAM', 'URBANIZE', 'URGENTLY', 'USEFULLY', 'USERNAME',
+    'UTENSILS', 'UTILIZED', 'UTTERING', 'VACANCIES', 'VACATION', 'VALIDATE', 'VALIDITY', 'VALUABLE',
+    'VALVULAR', 'VANISHED', 'VARIABLE', 'VARIANCE', 'VARIANTS', 'VASTNESS', 'VEHICLES', 'VELOCITY',
+    'VENTURES', 'VERBALLY', 'VERDICTS', 'VERIFIED', 'VERSIONS', 'VERTICAL', 'VETERANS', 'VIBRATED',
+    'VIBRATOR', 'VICINITY', 'VICTORIA', 'VICTORIE', 'VIEWABLE', 'VIEWINGS', 'VIEWPOIN', 'VIGILANT',
+    'VIGOROUS', 'VILLAGES', 'VILLAINS', 'VIOLATED', 'VIOLATES', 'VIOLENCE', 'VIRGINIA', 'VIRGINIA',
+    'VIRTUALL', 'VIRTUOUS', 'VISIBLER', 'VISITING', 'VISITORS', 'VISUALLY', 'VITALITY', 'VITAMINS',
+    'VIVIDNESS', 'VOLATILE', 'VOLCANIC', 'VOLLEYED', 'VOLTAGES', 'VOLUNTAR', 'VOMITING', 'VOYAGERS',
+    'WAITRESS', 'WANDERED', 'WARCRAFT', 'WARDROOM', 'WARDROBE', 'WARNINGS', 'WARRANTY', 'WARRIORS',
+    'WATCHDOG', 'WATCHFUL', 'WATCHING', 'WATERING', 'WAVEFORM', 'WEAKENED', 'WEAKNESS', 'WEARABLE',
+    'WEATHERS', 'WEATHING', 'WEBSITES', 'WEDDINGS', 'WEEKDAYS', 'WEEKENDS', 'WEIGHING', 'WEIGHTED',
+    'WELCOMES', 'WELLDONE', 'WELLNESS', 'WESTERLY', 'WHENEVER', 'WHEREVER', 'WHISTLED', 'WHITENED',
+    'WIDENING', 'WILDCARD', 'WILDFIRE', 'WILDLIFE', 'WILLFISH', 'WINDFALL', 'WINDINGS', 'WIRELESS',
+    'WITHDRAW', 'WITHHELD', 'WITHHOLD', 'WITHNESS', 'WITTIEST', 'WONDERED', 'WOODWORK', 'WORDING',
+    'WORDINGS', 'WORKABLE', 'WORKBOOK', 'WORKDAYS', 'WORKFLOW', 'WORKLOAD', 'WORKSHOP', 'WORKSITE',
+    'WORRYING', 'WORSHIPS', 'WORTHIER', 'WOULDN\'T', 'WOUNDING', 'WRAPPING', 'WRECKAGE', 'WRESTLED',
+    'WRETCHED', 'WRINGING', 'WRITINGS', 'YEARBOOK', 'YEARLONG', 'YELLING', 'YIELDING', 'YOUNGEST',
+    'YOURSELF', 'YOUTHFUL', 'ZEPPELIN', 'ZIGZAGGING', 'ZOOLOGIS',
+    'ABILITY', 'ABSENCE', 'ACADEMY', 'ACCOUNT', 'ACCUSED', 'ACHIEVE', 'ACQUIRE', 'ADDRESS',
+    'ADOPTED', 'ADVANCE', 'ADVISED', 'ADVISER', 'AFFAIRS', 'AFFECTS', 'AFRICAN', 'AGAINST',
+    'AIRLINE', 'AIRPORT', 'ALCOHOL', 'ALLOWED', 'ALREADY', 'ALTERED', 'AMAZING', 'AMERICA',
+    'ANALYST', 'ANCIENT', 'ANGELES', 'ANIMALS', 'ANOTHER', 'ANSWERS', 'ANYMORE', 'APPLIED',
+    'ARRIVED', 'ARTICLE', 'ARTISTS', 'ASPECTS', 'ASSAULT', 'ASSUMED', 'ASSURED', 'ATTACKS',
+    'ATTEMPT', 'ATTRACT', 'AUCTION', 'AUTHORS', 'AVERAGE', 'AWARDED', 'BACKING', 'BALANCE',
+    'BANKING', 'BARRIER', 'BATTERY', 'BEATING', 'BECAUSE', 'BECOMES', 'BEDROOM', 'BELIEVE',
+    'BENEATH', 'BENEFIT', 'BESIDES', 'BETWEEN', 'BILLION', 'BINDING', 'BLANKET', 'BLOCKED',
+    'BORDERS', 'BOROUGH', 'BOTTLES', 'BOWLING', 'BRANDED', 'BREATHE', 'BRIEFLY', 'BRIGADE',
+    'BRITISH', 'BROADER', 'BROADLY', 'BROTHER', 'BROUGHT', 'BUILDER', 'BURNING', 'CABINET',
+    'CALLING', 'CAMPING', 'CAPABLE', 'CAPITAL', 'CAPTAIN', 'CAPTION', 'CAPTURE', 'CAREFUL',
+    'CARRIED', 'CARRIER', 'CATALOG', 'CAUSING', 'CEILING', 'CENTRAL', 'CENTURY', 'CERTAIN',
+    'CHAMBER', 'CHANCES', 'CHANGED', 'CHANGES', 'CHANNEL', 'CHAPTER', 'CHARGES', 'CHARITY',
+    'CHARLES', 'CHARTER', 'CHEAPER', 'CHECKED', 'CHICKEN', 'CHOICES', 'CHRONIC', 'CIRCLES',
+    'CIRCUIT', 'CLAIMED', 'CLASSES', 'CLASSIC', 'CLEANED', 'CLEANER', 'CLEARLY', 'CLIMATE',
+    'CLOSELY', 'CLOSEST', 'CLOSING', 'CLOTHES', 'COASTAL', 'COATING', 'COLLEGE', 'COLONEL',
+    'COLUMNS', 'COMBINE', 'COMFORT', 'COMMAND', 'COMMENT', 'COMMITS', 'COMMONS', 'COMPACT',
+    'COMPANY', 'COMPARE', 'COMPETE', 'COMPLEX', 'COMPOSE', 'CONCEPT', 'CONCERN', 'CONDUCT',
+    'CONFIRM', 'CONNECT', 'CONSENT', 'CONSIST', 'CONTACT', 'CONTAIN', 'CONTENT', 'CONTEST',
+    'CONTEXT', 'CONTROL', 'CONVERT', 'COOKING', 'COOLING', 'CORRECT', 'CORRUPT', 'COSTING',
+    'COSTUME', 'COTTAGE', 'COUNCIL', 'COUNSEL', 'COUNTER', 'COUNTRY', 'COUPLED', 'COURAGE',
+    'COURSES', 'COVERED', 'CRASHED', 'CREATES', 'CREDITS', 'CRICKET', 'CRITICS', 'CROSSED',
+    'CRUCIAL', 'CRYSTAL', 'CULTURE', 'CURIOUS', 'CURRENT', 'CUSTODY', 'CUSTOMS', 'CUTTING',
+    'CYCLING', 'DAMAGES', 'DANCING', 'DEALING', 'DEBATED', 'DECADES', 'DECIDED', 'DECLARE',
+    'DECLINE', 'DEFAULT', 'DEFENCE', 'DEFICIT', 'DEFINED', 'DEGREES', 'DELAYED', 'DELIVER',
+    'DEMANDS', 'DENYING', 'DEPARTS', 'DEPENDS', 'DEPOSIT', 'DERIVED', 'DESCENT', 'DESERTS',
+    'DESERVE', 'DESIGNS', 'DESIRED', 'DESKTOP', 'DESPITE', 'DESTINY', 'DESTROY', 'DETAILS',
+    'DEVELOP', 'DEVOTED', 'DIAMOND', 'DIETARY', 'DIFFERS', 'DIGITAL', 'DIPLOMA', 'DISABLE',
+    'DISCUSS', 'DISEASE', 'DISPLAY', 'DISPUTE', 'DISTANT', 'DIVERSE', 'DIVIDED', 'DIVORCE',
+    'DOCTORS', 'DOLLARS', 'DONATED', 'DOUBLES', 'DRAFTED', 'DRAGONS', 'DRAWING', 'DRESSED',
+    'DRIVERS', 'DRIVING', 'DROPPED', 'DYNAMIC', 'EAGERLY', 'EARLIER', 'EARNING', 'EASTERN',
+    'ECONOMY', 'EDITING', 'EDITION', 'EDITORS', 'EFFECTS', 'EFFORTS', 'ELDERLY', 'ELECTED',
+    'ELEMENT', 'EMERGED', 'EMPEROR', 'EMPLOYS', 'ENABLED', 'ENACTED', 'ENDLESS', 'ENEMIES',
+    'ENGAGED', 'ENGINES', 'ENGLISH', 'ENHANCE', 'ENJOYED', 'ENQUIRY', 'ENSURED', 'ENTERED',
+    'ENTITLE', 'ENTRIES', 'EQUALLY', 'ERECTED', 'ESCAPED', 'ESSENCE', 'ESTATES', 'ETHICAL',
+    'EVIDENT', 'EXACTLY', 'EXAMINE', 'EXAMPLE', 'EXCEEDS', 'EXCITED', 'EXCLUDE', 'EXECUTE',
+    'EXHAUST', 'EXHIBIT', 'EXISTED', 'EXPECTS', 'EXPENSE', 'EXPERTS', 'EXPIRED', 'EXPLAIN',
+    'EXPLODE', 'EXPLOIT', 'EXPLORE', 'EXPOSED', 'EXPRESS', 'EXTENDS', 'EXTINCT', 'EXTRACT',
+    'EXTREME', 'FABRICS', 'FACTION', 'FACTORS', 'FACTORY', 'FACULTY', 'FAILING', 'FAILURE',
+    'FALLING', 'FARMING', 'FASHION', 'FASTEST', 'FATHERS', 'FATIGUE', 'FAVORED', 'FEARFUL',
+    'FEARING', 'FEATURE', 'FEDERAL', 'FEEDING', 'FEELING', 'FELLOWS', 'FERTILE', 'FICTION',
+    'FIGHTER', 'FIGURES', 'FILLING', 'FILMING', 'FILTERS', 'FINALLY', 'FINANCE', 'FINDING',
+    'FINGERS', 'FINLAND', 'FIREARM', 'FISHING', 'FITNESS', 'FITTING', 'FLORIDA', 'FLOWERS',
+    'FLOWING', 'FOCUSED', 'FOLDERS', 'FOLLOWS', 'FOOLISH', 'FOOTAGE', 'FORCING', 'FOREIGN',
+    'FOREVER', 'FORGING', 'FORGIVE', 'FORMATS', 'FORMING', 'FORMULA', 'FORTUNE', 'FORWARD',
+    'FOUNDED', 'FOUNDER', 'FRAGILE', 'FRANCES', 'FRANCIS', 'FRANKLY', 'FREEDOM', 'FREIGHT',
+    'FRIENDS', 'FUNDING', 'FUNERAL', 'FURTHER', 'FUTURES', 'GAINING', 'GALLERY', 'GATEWAY',
+    'GAZETTE', 'GENERAL', 'GENERIC', 'GENETIC', 'GENUINE', 'GEORGIA', 'GETTING', 'GLASSES',
+    'GLIMPSE', 'GLUCOSE', 'GODDESS', 'GRANTED', 'GRAVITY', 'GREATER', 'GREATLY', 'GROUNDS',
+    'GROWING', 'HABITAT', 'HANDFUL', 'HANDLED', 'HANDLES', 'HANGING', 'HAPPIER', 'HARBOUR',
+    'HARDEST', 'HARMFUL', 'HARMONY', 'HARVEST', 'HEADING', 'HEALING', 'HEALTHY', 'HEARING',
+    'HEAVILY', 'HEIGHTS', 'HELPFUL', 'HELPING', 'HERSELF', 'HIGHWAY', 'HIMSELF', 'HINTING',
+    'HISTORY', 'HITTING', 'HOLDING', 'HOLIDAY', 'HOLLAND', 'HONOURS', 'HOPEFUL', 'HORIZON',
+    'HORMONE', 'HOSTING', 'HOSTAGE', 'HOTTEST', 'HOUSING', 'HOWEVER', 'HUNDRED', 'HUNGARY',
+    'HUNTING', 'HUSBAND', 'ILLNESS', 'IMAGINE', 'IMAGING', 'IMMENSE', 'IMPACTS', 'IMPLIES',
+    'IMPORTS', 'IMPOSED', 'IMPRESS', 'IMPROVE', 'INCLUDE', 'INCOMES', 'INDEXES', 'INDIANA',
+    'INDICES', 'INDUCED', 'INJURED', 'INQUIRY', 'INSECTS', 'INSIGHT', 'INSPECT', 'INSPIRE',
+    'INSTALL', 'INSTANT', 'INSTEAD', 'INSURED', 'INTEGER', 'INTENSE', 'INTERIM', 'INTENDS',
+    'INVERSE', 'INVITED', 'INVOLVE', 'IRELAND', 'ISLANDS', 'ISRAELI', 'ISSUING', 'ITALIAN',
+    'JACKETS', 'JACKSON', 'JAMAICA', 'JANUARY', 'JEALOUS', 'JOHNSON', 'JOINING', 'JOINTLY',
+    'JOURNAL', 'JOURNEY', 'JUDGING', 'JUMPING', 'JUNGLES', 'JUNIORS', 'JUSTIFY', 'KEEPING',
+    'KENNEDY', 'KENNETH', 'KEYWORD', 'KILLERS', 'KILLING', 'KINDEST', 'KINGDOM', 'KITCHEN',
+    'KNIGHTS', 'KNOWING', 'LACKING', 'LANDING', 'LARGELY', 'LARGEST', 'LASTING', 'LATERAL',
+    'LAUGHED', 'LAWYERS', 'LEADERS', 'LEADING', 'LEAGUES', 'LEANING', 'LEARNED', 'LEATHER',
+    'LEAVING', 'LEGENDS', 'LENDING', 'LENGTHY', 'LETTERS', 'LETTING', 'LEVELED', 'LIBERAL',
+    'LIBERTY', 'LIBRARY', 'LICENSE', 'LIFTING', 'LIGHTED', 'LIGHTER', 'LIMITED', 'LINCOLN',
+    'LINKING', 'LISTING', 'LITERAL', 'LOBBIED', 'LOCATED', 'LOGICAL', 'LONGEST', 'LOOKING',
+    'LOOSELY', 'LOTTERY', 'LOYALTY', 'MACHINE', 'MADISON', 'MAGICAL', 'MAJESTY', 'MANAGED',
+    'MANAGER', 'MANDATE', 'MANKIND', 'MANSION', 'MANUALS', 'MAPPING', 'MARGINS', 'MARINES',
+    'MARKERS', 'MARKETS', 'MARKING', 'MARRIED', 'MARTIAL', 'MASSIVE', 'MASTERS', 'MATCHED',
+    'MATCHES', 'MATTERS', 'MAXWELL', 'MEANING', 'MEASURE', 'MEDICAL', 'MEETING', 'MEMBERS',
+    'MENTION', 'MERCURY', 'MESSAGE', 'METHODS', 'MICHAEL', 'MIDWEST', 'MIGRANT', 'MILITIA',
+    'MILLION', 'MINERAL', 'MINIMAL', 'MINIMUM', 'MINUTES', 'MIRACLE', 'MIRRORS', 'MISSING',
+    'MISSION', 'MISTAKE', 'MIXTURE', 'MOBILES', 'MODELED', 'MODERNS', 'MODULES', 'MOMENTS',
+    'MONITOR', 'MONSTER', 'MONTHLY', 'MORALLY', 'MORNING', 'MOTHERS', 'MOUNTED', 'MUSICAL',
+    'MYSTERY', 'NATIONS', 'NATURAL', 'NEAREST', 'NEITHER', 'NERVOUS', 'NETWORK', 'NEUTRAL',
+    'NIGERIA', 'NIGHTLY', 'NOMINAL', 'NORFOLK', 'NOTHING', 'NOTICED', 'NOTICES', 'NOTIONS',
+    'NOWHERE', 'NUCLEAR', 'NUMBERS', 'NURSING', 'OAKLAND', 'OBJECTS', 'OBLIGED', 'OBSCURE',
+    'OBSERVE', 'OBTAINS', 'OBVIOUS', 'OCTOBER', 'OFFERED', 'OFFICER', 'OFFICES', 'OFFLINE',
+    'ONGOING', 'ONTARIO', 'OPENING', 'OPERATE', 'OPINION', 'OPTICAL', 'OPTIMAL', 'OPTIONS',
+    'ORDERED', 'ORGANIC', 'ORIGINS', 'ORLEANS', 'ORPHANS', 'OUTCOME', 'OUTDOOR', 'OUTLOOK',
+    'OUTPUTS', 'OUTRAGE', 'OUTSIDE', 'OVERALL', 'OVERLAP', 'OVERSEE', 'PACKAGE', 'PACKETS',
+    'PAINTED', 'PAINTER', 'PALACES', 'PARKING', 'PARTIAL', 'PARTNER', 'PASSING', 'PASSION',
+    'PASSIVE', 'PATENTS', 'PATHWAY', 'PATIENT', 'PATRICK', 'PATRIOT', 'PATTERN', 'PAYMENT',
+    'PENALTY', 'PENDING', 'PENSION', 'PEOPLES', 'PERCENT', 'PERFECT', 'PERFORM', 'PERHAPS',
+    'PERIODS', 'PERMITS', 'PERSIAN', 'PERSIST', 'PERSONS', 'PHOENIX', 'PHRASES', 'PHYSICS',
+    'PICKING', 'PICTURE', 'PIONEER', 'PITCHED', 'PITCHER', 'PLACING', 'PLANNED', 'PLASTIC',
+    'PLATEAU', 'PLAYERS', 'PLAYING', 'PLEASED', 'PLEDGED', 'PLOTTED', 'POINTER', 'POINTED',
+    'POLLING', 'POLYMER', 'POPULAR', 'PORTION', 'POSTING', 'POTTERY', 'POULTRY', 'POVERTY',
+    'POWERED', 'PRAISED', 'PRECISE', 'PREDICT', 'PREMIUM', 'PREPARE', 'PRESENT', 'PRESSED',
+    'PREVENT', 'PRICING', 'PRIMARY', 'PRINTED', 'PRINTER', 'PRIVACY', 'PRIVATE', 'PROBLEM',
+    'PROCEED', 'PROCESS', 'PRODUCE', 'PRODUCT', 'PROFILE', 'PROFITS', 'PROGRAM', 'PROJECT',
+    'PROMISE', 'PROMOTE', 'PROPHET', 'PROPOSE', 'PROTECT', 'PROTEIN', 'PROTEST', 'PROUDLY',
+    'PROVIDE', 'PROVING', 'PUBLISH', 'PULLING', 'PURPOSE', 'PURSUED', 'PUSHING', 'PUTTING',
+    'QUALIFY', 'QUALITY', 'QUANTUM', 'QUARTER', 'QUERIES', 'QUICKLY', 'QUIETLY', 'RADICAL',
+    'RAILWAY', 'RAINBOW', 'RAISING', 'RANGING', 'RANKING', 'RAPIDLY', 'RATINGS', 'REACHED',
+    'REACTED', 'READERS', 'READING', 'REALITY', 'REALIZE', 'REASONS', 'REBUILT', 'RECALLS',
+    'RECEIPT', 'RECEIVE', 'RECIPES', 'RECORDS', 'RECOVER', 'REDUCED', 'REDUCES', 'REFEREE',
+    'REFINED', 'REFLECT', 'REFRESH', 'REFUSED', 'REFUSES', 'REGARDS', 'REGIONS', 'REGULAR',
+    'RELATED', 'RELATES', 'RELEASE', 'REMAINS', 'REMARKS', 'REMINDS', 'REMOVAL', 'REMOVED',
+    'RENEWAL', 'RENEWED', 'REPAIRS', 'REPLACE', 'REPLIED', 'REPORTS', 'REQUEST', 'REQUIRE',
+    'RESCUED', 'RESERVE', 'RESIDED', 'RESOLVE', 'RESORTS', 'RESPECT', 'RESPOND', 'RESTORE',
+    'RESULTS', 'RESUMED', 'RETAILS', 'RETIRED', 'RETREAT', 'RETURNS', 'REVEALS', 'REVENUE',
+    'REVERSE', 'REVIEWS', 'REVISED', 'REVIVAL', 'REWARDS', 'RICHARD', 'RICHEST', 'RIDDLES',
+    'ROBBERY', 'ROCKETS', 'ROLLING', 'ROMANCE', 'ROUGHLY', 'ROUNDED', 'ROUTINE', 'ROYALTY',
+    'RUNNING', 'RUSSIAN', 'SADNESS', 'SAILORS', 'SAMPLES', 'SATISFY', 'SAVINGS', 'SCANDAL',
+    'SCANNED', 'SCANNER', 'SCATTER', 'SCENERY', 'SCHEMES', 'SCHOLAR', 'SCHOOLS', 'SCIENCE',
+    'SCORING', 'SCRATCH', 'SCREENS', 'SCRIPTS', 'SEAFOOD', 'SEASONS', 'SEATING', 'SEATTLE',
+    'SECONDS', 'SECRETS', 'SECTION', 'SECURED', 'SEEKING', 'SEEMING', 'SEGMENT', 'SELECTS',
+    'SELLING', 'SENATOR', 'SENDING', 'SENIORS', 'SENSING', 'SERIOUS', 'SERVANT', 'SERVICE',
+    'SERVING', 'SESSION', 'SETTING', 'SETTLED', 'SEVENTH', 'SEVERAL', 'SHADOWS', 'SHALLOW',
+    'SHAPING', 'SHARING', 'SHELTER', 'SHERIFF', 'SHIFTED', 'SHINING', 'SHIPPED', 'SHORTER',
+    'SHORTLY', 'SHOWING', 'SHUTTLE', 'SIBLING', 'SIDEBAR', 'SIGNALS', 'SIGNING', 'SILENCE',
+    'SILICON', 'SIMILAR', 'SIMPLER', 'SINCERE', 'SINGING', 'SINGLES', 'SINKING', 'SISTERS',
+    'SITTING', 'SIXTEEN', 'SKILLED', 'SLAVERY', 'SLENDER', 'SLIPPED', 'SMALLER', 'SMOKING',
+    'SOCIETY', 'SOMEHOW', 'SOMEONE', 'SORTING', 'SPANISH', 'SPARKED', 'SPATIAL', 'SPEAKER',
+    'SPECIAL', 'SPECIES', 'SPECIFY', 'SPENCER', 'SPHERES', 'SPIRITS', 'SPOTTED', 'SPRINGS',
+    'SQUARES', 'STADIUM', 'STANLEY', 'STARTED', 'STARTER', 'STATING', 'STATION', 'STATUES',
+    'STAYING', 'STEPPED', 'STEWART', 'STICKER', 'STOMACH', 'STORAGE', 'STORIES', 'STRANGE',
+    'STREAMS', 'STREETS', 'STRINGS', 'STROKES', 'STUDENT', 'STUDIED', 'STUDIES', 'STUDIOS',
+    'STYLISH', 'SUBJECT', 'SUBMITS', 'SUCCEED', 'SUCCESS', 'SUFFERS', 'SUGGEST', 'SUICIDE',
+    'SUMMARY', 'SUMMITS', 'SUNRISE', 'SUPPORT', 'SUPPOSE', 'SUPREME', 'SURGERY', 'SURPLUS',
+    'SURVEYS', 'SURVIVE', 'SUSPECT', 'SUSPEND', 'SUSTAIN', 'SYMBOLS', 'SYSTEMS', 'TACTICS',
+    'TALKING', 'TARGETS', 'TEACHER', 'TEMPLES', 'TENANTS', 'TENDING', 'TENSION', 'TERRACE',
+    'TERRAIN', 'TESTING', 'TEXTURE', 'THEATER', 'THERAPY', 'THEREBY', 'THERMAL', 'THICKER',
+    'THINKER', 'THOMSON', 'THOUGHT', 'THREATS', 'THROUGH', 'TICKETS', 'TIGHTLY', 'TOBACCO',
+    'TONIGHT', 'TOOLBAR', 'TOTALLY', 'TOUCHED', 'TOUGHER', 'TOURING', 'TOURISM', 'TOURIST',
+    'TOWARDS', 'TRACKER', 'TRADING', 'TRAFFIC', 'TRAGEDY', 'TRAINED', 'TRAINER', 'TRANSIT',
+    'TRAPPED', 'TRAVELS', 'TREATED', 'TRIBUNE', 'TRIBUTE', 'TRIGGER', 'TRINITY', 'TRIUMPH',
+    'TROUBLE', 'TRUSTED', 'TRUSTEE', 'TUESDAY', 'TURNING', 'TWITTER', 'TYPICAL', 'UKRAINE',
+    'UNDERGO', 'UNIFIED', 'UNIFORM', 'UNKNOWN', 'UPDATES', 'UPGRADE', 'UPLOADS', 'USELESS',
+    'USUALLY', 'UTILITY', 'VACCINE', 'VALLEYS', 'VARIETY', 'VARIOUS', 'VARYING', 'VENTURE',
+    'VERSION', 'VESSELS', 'VETERAN', 'VICTIMS', 'VICTORY', 'VIEWING', 'VILLAGE', 'VINTAGE',
+    'VIOLENT', 'VIRTUAL', 'VISIBLE', 'VISITED', 'VISITOR', 'VOLCANO', 'VOLUMES', 'WAITING',
+    'WALKING', 'WANTING', 'WARNING', 'WARRANT', 'WASTING', 'WATCHED', 'WEALTHY', 'WEAPONS',
+    'WEARING', 'WEATHER', 'WEBSITE', 'WEDDING', 'WEEKEND', 'WEIGHTS', 'WELCOME', 'WELFARE',
+    'WESTERN', 'WHEREAS', 'WHETHER', 'WIDEST', 'WILLING', 'WINDOWS', 'WINNERS', 'WINNING',
+    'WINTERS', 'WITHOUT', 'WITNESS', 'WORKERS', 'WORKING', 'WORRIED', 'WORSHIP', 'WRITERS',
+    'WRITING', 'WRITTEN', 'YOUNGER', 'ZEALAND',
+    'ABOUT', 'ABOVE', 'ABUSE', 'ACTED', 'ACTOR', 'ACUTE', 'ADDED', 'ADMIT', 'ADOPT', 'ADULT',
+    'AFTER', 'AGAIN', 'AGENT', 'AGREE', 'AHEAD', 'AIMED', 'ALARM', 'ALBUM', 'ALERT', 'ALIEN',
+    'ALIGN', 'ALIKE', 'ALIVE', 'ALLOW', 'ALONE', 'ALONG', 'ALTER', 'AMONG', 'ANGEL', 'ANGER',
+    'ANGLE', 'ANGRY', 'APART', 'APPLE', 'APPLY', 'ARENA', 'ARGUE', 'ARISE', 'ARMED', 'ARMOR',
+    'ARRAY', 'ARROW', 'ASIDE', 'ASSET', 'AVOID', 'AWARD', 'AWARE', 'BADLY', 'BASED', 'BASIC',
+    'BASIS', 'BEACH', 'BEAST', 'BEGAN', 'BEGIN', 'BEING', 'BELOW', 'BENCH', 'BIRTH', 'BLACK',
+    'BLADE', 'BLAME', 'BLANK', 'BLAST', 'BLEND', 'BLIND', 'BLOCK', 'BLOOD', 'BLOWN', 'BLUES',
+    'BOARD', 'BONDS', 'BONES', 'BONUS', 'BOOKS', 'BOOST', 'BOUND', 'BRAIN', 'BRAND', 'BRASS',
+    'BRAVE', 'BREAD', 'BREAK', 'BREED', 'BRIDE', 'BRIEF', 'BRING', 'BROAD', 'BROKE', 'BROWN',
+    'BRUSH', 'BUILD', 'BUILT', 'BUNCH', 'BURST', 'BUYER', 'CABLE', 'CALLS', 'CAMPS', 'CANAL',
+    'CARDS', 'CARGO', 'CARRY', 'CASES', 'CATCH', 'CAUSE', 'CEASE', 'CHAIN', 'CHAIR', 'CHAOS',
+    'CHARM', 'CHART', 'CHASE', 'CHEAP', 'CHECK', 'CHEST', 'CHIEF', 'CHILD', 'CHINA', 'CHOSE',
+    'CIVIL', 'CLAIM', 'CLASS', 'CLEAN', 'CLEAR', 'CLERK', 'CLICK', 'CLIFF', 'CLIMB', 'CLOCK',
+    'CLOSE', 'CLOTH', 'CLOUD', 'CLUBS', 'COACH', 'COAST', 'COLOR', 'COMES', 'CORPS', 'COSTS',
+    'COUCH', 'COULD', 'COUNT', 'COURT', 'COVER', 'CRACK', 'CRAFT', 'CRASH', 'CRAZY', 'CREAM',
+    'CRIME', 'CROSS', 'CROWD', 'CROWN', 'CRUDE', 'CRUEL', 'CURVE', 'CYCLE', 'DAILY', 'DANCE',
+    'DATED', 'DATES', 'DEALS', 'DEALT', 'DEATH', 'DEBIT', 'DEBTS', 'DEBUT', 'DELAY', 'DEPTH',
+    'DESKS', 'DEVIL', 'DIARY', 'DIRTY', 'DOING', 'DOORS', 'DOUBT', 'DOWNS', 'DRAFT', 'DRAIN',
+    'DRAMA', 'DRANK', 'DRAWN', 'DRAWS', 'DREAM', 'DRESS', 'DRIED', 'DRILL', 'DRINK', 'DRIVE',
+    'DROPS', 'DROVE', 'DRUGS', 'DRUMS', 'DRUNK', 'DYING', 'EAGER', 'EARLY', 'EARTH', 'EATEN',
+    'EDGES', 'EIGHT', 'ELDER', 'ELECT', 'ELITE', 'EMAIL', 'EMPTY', 'ENDED', 'ENEMY', 'ENJOY',
+    'ENTER', 'ENTRY', 'EQUAL', 'ERROR', 'ESSAY', 'EVENT', 'EVERY', 'EXACT', 'EXAMS', 'EXIST',
+    'EXTRA', 'FACED', 'FACES', 'FACTS', 'FAILS', 'FAITH', 'FALSE', 'FAMED', 'FANCY', 'FARMS',
+    'FATAL', 'FAULT', 'FAVOR', 'FEARS', 'FEAST', 'FENCE', 'FERRY', 'FEVER', 'FEWER', 'FIBER',
+    'FIELD', 'FIFTH', 'FIFTY', 'FIGHT', 'FILED', 'FILES', 'FILMS', 'FINAL', 'FINDS', 'FIRED',
+    'FIRES', 'FIRMS', 'FIRST', 'FIXED', 'FLAGS', 'FLAME', 'FLASH', 'FLEET', 'FLESH', 'FLIES',
+    'FLOAT', 'FLOOD', 'FLOOR', 'FLOUR', 'FLOWS', 'FLUID', 'FOCUS', 'FOLKS', 'FORCE', 'FORMS',
+    'FORTH', 'FORTY', 'FORUM', 'FOUND', 'FRAME', 'FRANK', 'FRAUD', 'FRESH', 'FRONT', 'FROST',
+    'FRUIT', 'FULLY', 'FUNDS', 'FUNNY', 'GAINS', 'GAMES', 'GATES', 'GENES', 'GENRE', 'GHOST',
+    'GIANT', 'GIFTS', 'GIRLS', 'GIVEN', 'GIVES', 'GLASS', 'GLOBE', 'GLORY', 'GOALS', 'GOING',
+    'GOODS', 'GRACE', 'GRADE', 'GRAIN', 'GRAND', 'GRANT', 'GRAPE', 'GRAPH', 'GRASP', 'GRASS',
+    'GRAVE', 'GREAT', 'GREEK', 'GREEN', 'GREET', 'GRIEF', 'GRIPS', 'GROSS', 'GROUP', 'GROVE',
+    'GROWN', 'GROWS', 'GUARD', 'GUESS', 'GUEST', 'GUIDE', 'GUILT', 'HABIT', 'HANDS', 'HAPPY',
+    'HARDY', 'HARSH', 'HASTE', 'HAVEN', 'HEADS', 'HEARD', 'HEART', 'HEAVY', 'HELLO', 'HELPS',
+    'HENCE', 'HILLS', 'HINTS', 'HOLDS', 'HOLES', 'HOMES', 'HONEY', 'HONOR', 'HOPED', 'HOPES',
+    'HORSE', 'HOSTS', 'HOTEL', 'HOURS', 'HOUSE', 'HUMAN', 'HUMOR', 'HURRY', 'HURTS', 'IDEAL',
+    'IDEAS', 'IMAGE', 'IMPLY', 'INDEX', 'INNER', 'INPUT', 'IRISH', 'IRONY', 'ISSUE', 'ITEMS',
+    'JAPAN', 'JEANS', 'JEWEL', 'JOINT', 'JONES', 'JUDGE', 'JUICE', 'KEEPS', 'KILLS', 'KINDS',
+    'KINGS', 'KNIFE', 'KNOCK', 'KNOWN', 'KNOWS', 'LABEL', 'LACKS', 'LAKES', 'LANDS', 'LANES',
+    'LARGE', 'LASER', 'LASTS', 'LATER', 'LAUGH', 'LAYER', 'LEADS', 'LEARN', 'LEASE', 'LEAST',
+    'LEAVE', 'LEGAL', 'LEVEL', 'LEWIS', 'LIGHT', 'LIKED', 'LIKES', 'LIMIT', 'LINED', 'LINES',
+    'LINKS', 'LIONS', 'LISTS', 'LIVED', 'LIVER', 'LIVES', 'LOANS', 'LOCAL', 'LOCKS', 'LODGE',
+    'LOGIC', 'LOOKS', 'LOOPS', 'LOOSE', 'LORDS', 'LOSES', 'LOVED', 'LOVER', 'LOVES', 'LOWER',
+    'LOYAL', 'LUCKY', 'LUNCH', 'LYING', 'MAGIC', 'MAJOR', 'MAKER', 'MAKES', 'MALES', 'MANOR',
+    'MARCH', 'MARKS', 'MARRY', 'MATCH', 'MAYBE', 'MAYOR', 'MEALS', 'MEANS', 'MEANT', 'MEDAL',
+    'MEDIA', 'MEETS', 'MERCY', 'MERIT', 'MERRY', 'METAL', 'METER', 'MIDST', 'MIGHT', 'MILES',
+    'MILLS', 'MINDS', 'MINES', 'MINOR', 'MINUS', 'MIXED', 'MODEL', 'MODES', 'MONEY', 'MONTH',
+    'MORAL', 'MOTOR', 'MOUNT', 'MOUSE', 'MOUTH', 'MOVED', 'MOVES', 'MOVIE', 'MUSIC', 'NAKED',
+    'NAMED', 'NAMES', 'NEEDS', 'NERVE', 'NEVER', 'NEWLY', 'NIGHT', 'NINTH', 'NOBLE', 'NODES',
+    'NOISE', 'NORTH', 'NOTED', 'NOTES', 'NOVEL', 'NURSE', 'OCCUR', 'OCEAN', 'OFFER', 'OFTEN',
+    'OPENS', 'OPERA', 'ORDER', 'OTHER', 'OUGHT', 'OUTER', 'OWNED', 'OWNER', 'OXIDE', 'PAGES',
+    'PAINT', 'PAIRS', 'PANEL', 'PANIC', 'PANTS', 'PAPER', 'PARKS', 'PARTS', 'PARTY', 'PATCH',
+    'PATHS', 'PAUSE', 'PEACE', 'PEARL', 'PEERS', 'PENNY', 'PHASE', 'PHONE', 'PHOTO', 'PIANO',
+    'PICKS', 'PIECE', 'PILES', 'PILLS', 'PILOT', 'PITCH', 'PIZZA', 'PLACE', 'PLAIN', 'PLANE',
+    'PLANS', 'PLANT', 'PLATE', 'PLAYS', 'PLAZA', 'PLOTS', 'POEMS', 'POETS', 'POINT', 'POLAR',
+    'POLES', 'POLLS', 'POOLS', 'PORTS', 'POSED', 'POSTS', 'POUND', 'POWER', 'PRESS', 'PRICE',
+    'PRIDE', 'PRIME', 'PRINT', 'PRIOR', 'PRIZE', 'PROBE', 'PROOF', 'PROUD', 'PROVE', 'PULLS',
+    'PULSE', 'PUMPS', 'PUNCH', 'QUEEN', 'QUERY', 'QUEST', 'QUEUE', 'QUICK', 'QUIET', 'QUITE',
+    'QUOTE', 'RACES', 'RADAR', 'RADIO', 'RAILS', 'RAISE', 'RALLY', 'RANCH', 'RANGE', 'RANKS',
+    'RAPID', 'RATED', 'RATES', 'RATIO', 'REACH', 'REACT', 'READS', 'READY', 'REALM', 'REFER',
+    'REIGN', 'RELAX', 'REPLY', 'RIDGE', 'RIFLE', 'RIGHT', 'RINGS', 'RISEN', 'RISES', 'RISKS',
+    'RISKY', 'RIVAL', 'RIVER', 'ROADS', 'ROCKS', 'ROCKY', 'ROLES', 'ROLLS', 'ROMAN', 'ROOTS',
+    'ROPES', 'ROSES', 'ROUGH', 'ROUND', 'ROUTE', 'ROYAL', 'RUINS', 'RULED', 'RULER', 'RULES',
+    'RURAL', 'SADLY', 'SAINT', 'SALAD', 'SALES', 'SANDY', 'SAVED', 'SAVES', 'SCALE', 'SCENE',
+    'SCOPE', 'SCORE', 'SCOUT', 'SEATS', 'SEEKS', 'SEEMS', 'SELLS', 'SENDS', 'SENSE', 'SERVE',
+    'SEVEN', 'SHALL', 'SHAME', 'SHAPE', 'SHARE', 'SHARP', 'SHEET', 'SHELF', 'SHELL', 'SHIFT',
+    'SHINE', 'SHIPS', 'SHIRT', 'SHOCK', 'SHOES', 'SHOOK', 'SHOOT', 'SHOPS', 'SHORE', 'SHORT',
+    'SHOTS', 'SHOWN', 'SHOWS', 'SIDES', 'SIGHT', 'SIGNS', 'SILLY', 'SIMON', 'SINCE', 'SITES',
+    'SIXTH', 'SIXTY', 'SIZED', 'SIZES', 'SKILL', 'SLAVE', 'SLEEP', 'SLIDE', 'SLOPE', 'SMALL',
+    'SMART', 'SMELL', 'SMILE', 'SMITH', 'SMOKE', 'SNAKE', 'SOLID', 'SOLVE', 'SONGS', 'SORRY',
+    'SORTS', 'SOULS', 'SOUND', 'SOUTH', 'SPACE', 'SPARE', 'SPARK', 'SPEAK', 'SPEED', 'SPELL',
+    'SPEND', 'SPENT', 'SPIES', 'SPLIT', 'SPOKE', 'SPOTS', 'SQUAD', 'STACK', 'STAFF', 'STAGE',
+    'STAKE', 'STAMP', 'STAND', 'STARS', 'START', 'STATE', 'STAYS', 'STEAM', 'STEEL', 'STEMS',
+    'STEPS', 'STICK', 'STILL', 'STOCK', 'STOLE', 'STONE', 'STOOD', 'STOPS', 'STORE', 'STORM',
+    'STORY', 'STRIP', 'STUCK', 'STUDY', 'STUFF', 'STYLE', 'SUGAR', 'SUITE', 'SUITS', 'SUPER',
+    'SURGE', 'SWEET', 'SWEPT', 'SWIFT', 'SWING', 'SWISS', 'SWORD', 'TABLE', 'TAKEN', 'TAKES',
+    'TALES', 'TALKS', 'TANKS', 'TAPES', 'TASKS', 'TASTE', 'TAXES', 'TEACH', 'TEAMS', 'TEARS',
+    'TEENS', 'TEETH', 'TELLS', 'TEMPO', 'TENDS', 'TENOR', 'TENTH', 'TERMS', 'TESTS', 'TEXAS',
+    'TEXTS', 'THANK', 'THEFT', 'THEME', 'THICK', 'THING', 'THINK', 'THIRD', 'THOSE', 'THREE',
+    'THREW', 'THROW', 'THUMB', 'TIGHT', 'TIMER', 'TIMES', 'TIRED', 'TITLE', 'TODAY', 'TOKEN',
+    'TONES', 'TOOLS', 'TOOTH', 'TOPIC', 'TORCH', 'TOTAL', 'TOUCH', 'TOUGH', 'TOURS', 'TOWER',
+    'TOWNS', 'TRACE', 'TRACK', 'TRADE', 'TRAIL', 'TRAIN', 'TRAIT', 'TRASH', 'TREAT', 'TREES',
+    'TREND', 'TRIAL', 'TRIBE', 'TRICK', 'TRIED', 'TRIES', 'TRIPS', 'TROOP', 'TRUCK', 'TRULY',
+    'TRUNK', 'TRUST', 'TRUTH', 'TUBES', 'TUNES', 'TURNS', 'TWICE', 'TWINS', 'TYPES', 'ULTRA',
+    'UNCLE', 'UNDER', 'UNION', 'UNITE', 'UNITS', 'UNITY', 'UNTIL', 'UPPER', 'UPSET', 'URBAN',
+    'URGED', 'USAGE', 'USERS', 'USING', 'USUAL', 'VALID', 'VALUE', 'VALVE', 'VENUE', 'VERSE',
+    'VIDEO', 'VIEWS', 'VILLA', 'VIRAL', 'VIRUS', 'VISIT', 'VITAL', 'VOCAL', 'VOICE', 'VOTED',
+    'VOTER', 'VOTES', 'WAGES', 'WAGON', 'WAIST', 'WALKS', 'WALLS', 'WANTS', 'WARNS', 'WASTE',
+    'WATCH', 'WATER', 'WAVES', 'WEEKS', 'WELLS', 'WHALE', 'WHEAT', 'WHEEL', 'WHERE', 'WHICH',
+    'WHILE', 'WHITE', 'WHOLE', 'WHOSE', 'WIDER', 'WIDTH', 'WINDS', 'WINES', 'WINGS', 'WOMAN',
+    'WOMEN', 'WOODS', 'WORDS', 'WORKS', 'WORLD', 'WORRY', 'WORSE', 'WORST', 'WORTH', 'WOULD',
+    'WOUND', 'WRITE', 'WRONG', 'WROTE', 'YARDS', 'YEARS', 'YIELD', 'YOUNG', 'YOURS', 'YOUTH', 'ZONES'
+];
+
+var wordSet = new Set(wordList);
+
+// ============ GAME STATE ============
+var isFullGame = false;
+var fullGameRound = 0;
+
+var letters = { selected: [], timer: null, time: 30, phase: 'picking', playerWords: [], playerLocked: [] };
+var numbers = { selected: [], target: null, timer: null, time: 30, phase: 'picking', playerAnswers: [], playerLocked: [] };
+var conundrum = { word: '', scrambled: '', timer: null, answerTimer: null, time: 30, answerTime: 5, phase: 'waiting', buzzedPlayer: null, playersUsed: [] };
+
+var consonants = 'BCDFGHJKLMNPQRSTVWXYZ';
+var vowels = 'AEIOU';
+
+// ============ CONUNDRUM WORDS ============
+var conundrumWords = [
+    'ADVENTURE', 'ALGORITHM', 'BEAUTIFUL', 'BREAKFAST', 'BRILLIANT', 'BUTTERFLY', 'CALCULATE', 'CELEBRATE',
+    'CHALLENGE', 'CHAMPIONS', 'CHARACTER', 'CHOCOLATE', 'CHRISTMAS', 'COMMUNITY', 'COMPLAINT',     'CHALLENGE', 'CHAMPIONS', 'CHARACTER', 'CHOCOLATE', 'CHRISTMAS', 'COMMUNITY', 'COMPLAINT', 'COMPUTERS',
+    'CONDITION', 'CONFIRMED', 'CONFUSION', 'CONNECTED', 'CONSCIOUS', 'CONSUMERS', 'CONTAINER', 'CONTINUED',
+    'COPYRIGHT', 'CORPORATE', 'COUNTRIES', 'CRAFTSMEN', 'CREATURES', 'CRIMINALS', 'CUSTOMERS', 'DANGEROUS',
+    'DATABASES', 'DAUGHTERS', 'DEDICATED', 'DELIGHTED', 'DEMOCRACY', 'DEPARTURE', 'DEPRESSED', 'DESCRIBED',
+    'DESIGNERS', 'DESPERATE', 'DESTROYED', 'DEVELOPED', 'DIFFERENT', 'DIFFICULT', 'DINOSAURS', 'DIRECTION',
+    'DIRECTORS', 'DISAPPEAR', 'DISCOVERY', 'DISCUSSED', 'DISPLAYED', 'DISTANCES', 'DISTURBED', 'EDUCATION',
+    'EFFECTIVE', 'EFFICIENT', 'ELEPHANTS', 'ELIMINATE', 'ELSEWHERE', 'EMBARRASS', 'EMERGENCY', 'EMOTIONAL',
+    'EMPLOYEES', 'EMPOWERED', 'ENCOUNTER', 'ENCOURAGE', 'ENJOYABLE', 'ENTERTAIN', 'ENVELOPES', 'EQUIPMENT',
+    'ESTABLISH', 'ETIQUETTE', 'EVERYBODY', 'EVOLUTION', 'EXCELLENT', 'EXCESSIVE', 'EXCHANGES', 'EXCLUSIVE',
+    'EXERCISES', 'EXISTENCE', 'EXPANSION', 'EXPENSIVE', 'EXPERTISE', 'EXPLAINED', 'EXPLOSION', 'EXPRESSED',
+    'EXTENSION', 'FABRICATE', 'FACTORIES', 'FANTASTIC', 'FARMHOUSE', 'FASCINATE', 'FAVORITES', 'FEATURING',
+    'FESTIVALS', 'FILMMAKER', 'FINANCIAL', 'FINGERTIP', 'FIREPLACE', 'FISHERMAN', 'FLASHBACK', 'FLOWERING',
+    'FLUCTUATE', 'FOLLOWING', 'FOOLPROOF', 'FORBIDDEN', 'FOREIGNER', 'FORGOTTEN', 'FORMATION', 'FORTUNATE',
+    'FRAMEWORK', 'FRANCHISE', 'FREQUENCY', 'FROSTBITE', 'FRUITCAKE', 'FRUSTRATE', 'FULFILLED', 'FUNCTIONS',
+    'FURNISHED', 'FURNITURE', 'GALLERIES', 'GARDENING', 'GENERATED', 'GENTLEMAN', 'GEOMETRIC', 'GHOSTLIKE',
+    'GLAMOROUS', 'GODFATHER', 'GOLDSMITH', 'GOODNIGHT', 'GOVERNING', 'GRADUALLY', 'GRADUATED', 'GREETINGS',
+    'GREYHOUND', 'GROCERIES', 'GROUNDING', 'GUARANTEE', 'GUARDIANS', 'GUERRILLA', 'GUIDEBOOK', 'GUIDELINE',
+    'GUITARIST', 'GYMNASIUM', 'GYMNASTIC', 'HAIRBRUSH', 'HALLOWEEN', 'HAMPSHIRE', 'HANDBRAKE', 'HANDCRAFT',
+    'HAPPENING', 'HAPPINESS', 'HARDBOARD', 'HARMONICA', 'HARMONICS', 'HARMONIZE', 'HARVESTED', 'HAZARDOUS',
+    'HEADACHES', 'HEADLIGHT', 'HEADLINES', 'HEADPHONE', 'HEALTHIER', 'HEARTACHE', 'HEARTBEAT', 'HEARTLAND',
+    'HEIGHTENS', 'HELPFULLY', 'HESITATED', 'HIERARCHY', 'HIGHLIGHT', 'HILARIOUS', 'HISTORIAN', 'HITCHHIKE',
+    'HOMEOWNER', 'HOPEFULLY', 'HORSEBACK', 'HOSPITALS', 'HOSTILITY', 'HOUSEHOLD', 'HURRICANE', 'HYPNOTIZE',
+    'IDENTICAL', 'IGNORANCE', 'ILLEGALLY', 'IMAGINARY', 'IMMEDIATE', 'IMMIGRANT', 'IMPATIENT', 'IMPLEMENT',
+    'IMPORTANT', 'IMPORTING', 'IMPRESSED', 'IMPROVING', 'INCLUDING', 'INCORRECT', 'INCREASED', 'INDICATES',
+    'INDONESIA', 'INFECTION', 'INFLATION', 'INFLUENCE', 'INFORMANT', 'INHERITED', 'INITIALLY', 'INITIATED',
+    'INJECTION', 'INNOVATOR', 'INSCRIBED', 'INSPECTOR', 'INSTALLED', 'INSTANTLY', 'INSTITUTE', 'INSURANCE',
+    'INTEGRATE', 'INTEGRITY', 'INTELLECT', 'INTENDING', 'INTENSELY', 'INTENTION', 'INTERFACE', 'INTERPRET',
+    'INTERRUPT', 'INTERVALS', 'INTERVIEW', 'INTRODUCE', 'INTRUSION', 'INVENTION', 'INVENTORY', 'INVESTING',
+    'INVESTORS', 'INVISIBLE', 'INVOLVING', 'IRRITATED', 'ISLANDERS', 'JELLYFISH', 'JEWELLERY', 'JUNCTIONS',
+    'KEYBOARDS', 'KIDNAPPED', 'KINGMAKER', 'KNOWLEDGE', 'LABYRINTH', 'LANDSCAPE', 'LANGUAGES', 'LAWNMOWER',
+    'LEGENDARY', 'LENGTHENS', 'LIBERATED', 'LIBRARIES', 'LICENSING', 'LIFESTYLE', 'LIFETIMES', 'LIGHTBULB',
+    'LIGHTNING', 'LIMESTONE', 'LIMITLESS', 'LINGERING', 'LITERALLY', 'LIVESTOCK', 'LOGARITHM', 'LOGISTICS',
+    'LONGEVITY', 'LONGITUDE', 'LOWERCASE', 'LUDICROUS', 'LUXURIOUS', 'MACHINERY', 'MAGAZINES', 'MAGNETISM',
+    'MAGNETIZE', 'MAGNITUDE', 'MAINFRAME', 'MAINTAINS', 'MAKESHIFT', 'MALICIOUS', 'MANDATORY', 'MANIFESTO',
+    'MANNEQUIN', 'MARKETING', 'MARMALADE', 'MASCULINE', 'MASTERFUL', 'MATERIALS', 'MEANWHILE', 'MECHANICS',
+    'MECHANISM', 'MECHANIZE', 'MEDIATORS', 'MEDICALLY', 'MELBOURNE', 'MEMORABLE', 'MENTIONED', 'MERCHANTS',
+    'MERCILESS', 'MESSAGING', 'MESSENGER', 'METAPHORS', 'MICROCHIP', 'MICROWAVE', 'MIDSTREAM', 'MIGRATION',
+    'MILESTONE', 'MINIMIZED', 'MISERABLE', 'MODERNIZE', 'MOLECULAR', 'MONASTERY', 'MONITORED', 'MOONLIGHT',
+    'MORTGAGED', 'MOTIVATED', 'MOUNTAINS', 'MOVEMENTS', 'MULTIPLES', 'MUNICIPAL', 'MUSHROOMS', 'MYSTERIES',
+    'MYTHOLOGY', 'NARRATIVE', 'NATIONALS', 'NATURALLY', 'NAVIGATED', 'NECESSARY', 'NEGOTIATE', 'NEIGHBOUR',
+    'NETWORKED', 'NEWSPAPER', 'NICKNAMED', 'NIGHTMARE', 'NOMINATED', 'NORTHEAST', 'NORTHWEST', 'NOTEBOOKS',
+    'NOVELISTS', 'NUMERICAL', 'NUTRITION', 'OBEDIENCE', 'OBJECTIVE', 'OBLIGATED', 'OBSERVING', 'OBSTACLES',
+    'OBTAINING', 'OBVIOUSLY', 'OCCASIONS', 'OCCUPANTS', 'OCCUPYING', 'OCCURRING', 'OFFENSIVE', 'OFFICIALS',
+    'OFFSPRING', 'OPERATING', 'OPERATION', 'OPERATORS', 'OPPONENTS', 'OPPOSITES', 'OPPRESSED', 'ORCHESTRA',
+    'ORGANISED', 'ORGANISMS', 'ORGANIZED', 'ORGANIZER', 'ORIGINATE', 'ORPHANAGE', 'OTHERWISE', 'OURSELVES',
+    'OUTBREAKS', 'OUTLINING', 'OUTSIDERS', 'OUTWARDLY', 'OVERBOARD', 'OVERNIGHT', 'OVERPOWER', 'OVERTHROW',
+    'OVERWHELM', 'OWNERSHIP', 'PACKAGING', 'PAINTWORK', 'PARAGRAPH', 'PARALYSED', 'PARAMOUNT', 'PARENTING',
+    'PARKLANDS', 'PARTIALLY', 'PARTICLES', 'PARTITION', 'PARTNERED', 'PATHOLOGY', 'PATRIARCH', 'PATRONAGE',
+    'PENINSULA', 'PERCEIVED', 'PERFECTLY', 'PERFORMED', 'PERFORMER', 'PERIMETER', 'PERMITTED', 'PERPETUAL',
+    'PERSISTED', 'PERSONNEL', 'PERSUADED', 'PESSIMIST', 'PETROLEUM', 'PHENOMENA', 'PHONETICS', 'PHOTOCOPY',
+    'PHYSICIAN', 'PHYSICIST', 'PICTURING', 'PIGGYBACK', 'PLACEMENT', 'PLAINTIFF', 'PLANETARY', 'PLATFORMS',
+    'PLENTIFUL', 'POISONING', 'POLICEMAN', 'POLISHING', 'POLITICAL', 'POLLUTANT', 'POLLUTION', 'POPULATED',
+    'PORTFOLIO', 'PORTRAYED', 'POSITIONS', 'POSSESSED', 'POSTCARDS', 'POSTPONED', 'POTASSIUM', 'POTENTIAL',
+    'POWERLESS', 'PRACTICAL', 'PRACTISED', 'PRAGMATIC', 'PRECISELY', 'PRECISION', 'PREDICTED', 'PREFERRED',
+    'PREJUDICE', 'PREMIERED', 'PREPARING', 'PRESCRIBE', 'PRESENTED', 'PRESERVED', 'PRESIDENT', 'PRESIDING',
+    'PRESSURED', 'PRETENDED', 'PREVENTED', 'PRIMARILY', 'PRIMITIVE', 'PRINCIPAL', 'PRINCIPLE', 'PRINTOUTS',
+    'PRISONERS', 'PRIVATELY', 'PRIVILEGE', 'PROACTIVE', 'PROBATION', 'PROCEDURE', 'PROCEEDED', 'PROCESSED',
+    'PROCESSOR', 'PROCLAIMS', 'PRODUCERS', 'PRODUCING', 'PROFESSED', 'PROFESSOR', 'PROFILING', 'PROGRAMME',
+    'PROJECTED', 'PROJECTOR', 'PROLONGED', 'PROMINENT', 'PROMISING', 'PROMOTION', 'PRONOUNCE', 'PROPELLED',
+    'PROPONENT', 'PROPOSALS', 'PROPOSING', 'PROTECTED', 'PROTECTOR', 'PROTESTED', 'PROTOCOLS', 'PROTOTYPE',
+    'PROVIDERS', 'PROVIDING', 'PROVINCES', 'PROVISION', 'PROVOKING', 'PROXIMITY', 'PSEUDONYM', 'PUBLICIST',
+    'PUBLICITY', 'PUBLICIZE', 'PUBLISHED', 'PUBLISHER', 'PURCHASED', 'PURPOSELY', 'QUALIFIED', 'QUALITIES',
+    'QUARTERLY', 'QUESTIONS', 'QUICKENED', 'QUICKSAND', 'QUIETNESS', 'QUOTATION', 'RACEHORSE', 'RADICALLY',
+    'RADIATION', 'RAINWATER', 'REARRANGE', 'REASONING', 'REBELLION', 'RECALLING', 'RECEIVING', 'RECIPIENT',
+    'RECKONING', 'RECOGNIZE', 'RECOMMEND', 'RECONCILE', 'RECOVERED', 'RECRUITED', 'RECTANGLE', 'RECURRING',
+    'RECYCLING', 'REDEVELOP', 'REDIRECTS', 'REDUCTION', 'REDUNDANT', 'REFERENCE', 'REFLECTED', 'REFORMING',
+    'REFRESHED', 'REGARDING', 'REGIMENTS', 'REGISTRAR', 'REGRETTED', 'REGULARLY', 'REGULATED', 'REHEARSAL',
+    'REINFORCE', 'REITERATE', 'REJECTING', 'REJECTION', 'RELATIONS', 'RELEASING', 'RELEVANCE', 'RELIEVING',
+    'RELIGIONS', 'RELIGIOUS', 'RELUCTANT', 'REMAINDER', 'REMAINING', 'REMARKING', 'REMEMBERS', 'REMINDING',
+    'REMOVABLE', 'RENDERING', 'RENEWABLE', 'REOPENING', 'REPAYMENT', 'REPEATING', 'REPLACING', 'REPLICATE',
+    'REPORTERS', 'REPORTING', 'REPRESENT', 'REPRESSED', 'REPRODUCE', 'REPUBLICS', 'REPUTABLE', 'REQUESTED',
+    'REQUIRING', 'RESEMBLED', 'RESERVOIR', 'RESIDENCE', 'RESIDENTS', 'RESIGNING', 'RESISTANT', 'RESOLVING',
+    'RESONANCE', 'RESOURCES', 'RESPECTED', 'RESPONDED', 'RESPONSES', 'RESTORING', 'RESTRAINT', 'RESTRICTS',
+    'RESULTING', 'RETAILERS', 'RETAILING', 'RETAINING', 'RETREATED', 'RETRIEVED', 'RETURNING', 'REVEALING',
+    'REVERSALS', 'REVERSING', 'REVIEWING', 'REVISIONS', 'REVOLTING', 'REVOLVERS', 'REWARDING', 'REWRITTEN',
+    'RIGHTEOUS', 'RINGTONES', 'RIVERSIDE', 'ROADBLOCK', 'ROMANTICS', 'ROUGHNESS', 'ROUTINELY', 'SACRIFICE',
+    'SAFEGUARD', 'SAILBOATS', 'SALVATION', 'SANCTIONS', 'SANDPAPER', 'SANDSTORM', 'SATELLITE', 'SATISFIED',
+    'SATURATED', 'SAXOPHONE', 'SCAFFOLDS', 'SCATTERED', 'SCENARIOS', 'SCEPTICAL', 'SCHEDULED', 'SCHOLARLY',
+    'SCHOOLBOY', 'SCIENTIST', 'SCORCHING', 'SCRAMBLED', 'SCREAMING', 'SCREENING', 'SCRIPTING', 'SCRIPTURE',
+    'SEARCHING', 'SEASHELLS', 'SEASONING', 'SECONDARY', 'SECRETARY', 'SECRETIVE', 'SEDIMENTS', 'SEEMINGLY',
+    'SEGMENTED', 'SELECTING', 'SELECTION', 'SELECTIVE', 'SEMANTICS', 'SENSATION', 'SENSELESS', 'SENSITIVE',
+    'SENTENCED', 'SENTIMENT', 'SEPARATED', 'SEPTEMBER', 'SEQUENCES', 'SERIOUSLY', 'SERVICING', 'SEVENTEEN',
+    'SHELTERED', 'SHIVERING', 'SHOEMAKER', 'SHORTCUTS', 'SHOULDERS', 'SHOWROOMS', 'SHRINKAGE', 'SICKENING',
+    'SIDEBURNS', 'SIDELIGHT', 'SIDELINES', 'SIDETRACK', 'SIGHTINGS', 'SIGNALING', 'SIGNATURE', 'SIGNBOARD',
+    'SIGNIFIED', 'SIMILARLY', 'SIMULATED', 'SIMULATOR', 'SINCERELY', 'SINGAPORE', 'SITUATION', 'SKEPTICAL',
+    'SKETCHPAD', 'SKYROCKET', 'SLAUGHTER', 'SLEEPLESS', 'SLIGHTEST', 'SMUGGLING', 'SNOWBOARD', 'SNOWFLAKE',
+    'SNOWSTORM', 'SOCIALISM', 'SOCIALIST', 'SOCIALITE', 'SOCIALIZE', 'SOCIETIES', 'SOCIOLOGY', 'SOFTENING',
+    'SOLUTIONS', 'SOMEPLACE', 'SOMETHING', 'SOMETIMES', 'SOMEWHERE', 'SOPHOMORE', 'SORCERERS', 'SOUNDNESS',
+    'SOUTHEAST', 'SOUTHWARD', 'SOUTHWEST', 'SOUVENIRS', 'SOVEREIGN', 'SPACESHIP', 'SPACESUIT', 'SPAGHETTI',
+    'SPARKLERS', 'SPARKLING', 'SPEARHEAD', 'SPEAKABLE', 'SPECIALTY', 'SPECIFICS', 'SPECIFIED', 'SPECIMENS',
+    'SPECTACLE', 'SPECTATOR', 'SPECULATE', 'SPEEDBOAT', 'SPELLINGS', 'SPHERICAL', 'SPILLOVER', 'SPIRITUAL',
+    'SPLASHING', 'SPOKESMAN', 'SPONSORED', 'SPOTLIGHT', 'SPRINKLED', 'SPRINKLER', 'SQUADRONS', 'SQUASHING',
+    'SQUEAKING', 'SQUEEZING', 'STABILITY', 'STAGEHAND', 'STAGGERED', 'STAIRCASE', 'STAIRWELL', 'STALEMATE',
+    'STANDARDS', 'STARLIGHT', 'STARTLING', 'STATEMENT', 'STATEROOM', 'STATEWIDE', 'STATIONED', 'STATISTIC',
+    'STEADFAST', 'STEAMBOAT', 'STEAMSHIP', 'STEEPNESS', 'STIFFENED', 'STIMULATE', 'STOCKPILE', 'STONEWALL',
+    'STOREROOM', 'STORYLINE', 'STRANGELY', 'STRANGERS', 'STRANGLED', 'STRATEGIC', 'STREAMING', 'STREETCAR',
+    'STRENGTHS', 'STRENUOUS', 'STRETCHED', 'STRINGENT', 'STRONGEST', 'STRUCTURE', 'STRUGGLED', 'STRUGGLES',
+    'STUMBLING', 'STUPIDITY', 'STYLISTIC', 'SUBATOMIC', 'SUBDIVIDE', 'SUBJECTED', 'SUBMARINE', 'SUBMERGED',
+    'SUBMITTED', 'SUBSCRIBE', 'SUBSIDIES', 'SUBSIDIZE', 'SUBSTANCE', 'SUBSTRATE', 'SUBTITLES', 'SUCCEEDED',
+    'SUCCESSES', 'SUCCESSOR', 'SUFFERING', 'SUGGESTED', 'SUITCASES', 'SUMMARIES', 'SUMMARIZE', 'SUNFLOWER',
+    'SUNSCREEN', 'SUNSTROKE', 'SUPERHERO', 'SUPERIORS', 'SUPERSTAR', 'SUPERVISE', 'SUPPLIERS', 'SUPPLYING',
+    'SUPPORTED', 'SUPPORTER', 'SUPPOSING', 'SUPREMACY', 'SURCHARGE', 'SURFACING', 'SURPRISED', 'SURRENDER',
+    'SURROGATE', 'SURPASSED', 'SURVEYING', 'SURVEYORS', 'SURVIVING', 'SURVIVORS', 'SUSPECTED', 'SUSPENDED',
+    'SUSPICION', 'SUSTAINED', 'SWALLOWED', 'SWEETENED', 'SWEETNESS', 'SWIFTNESS', 'SWINDLERS', 'SWITCHING',
+    'SWORDFISH', 'SWORDSMAN', 'SYLLABLES', 'SYMBOLISM', 'SYMBOLIZE', 'SYMMETRIC', 'SYMPHONIC', 'SYMPOSIUM',
+    'SYNAGOGUE', 'SYNERGIES', 'SYNTHESIS', 'SYNTHETIC', 'TABLEWARE', 'TAILORING', 'TAKEAWAYS', 'TAKEOVERS',
+    'TALKATIVE', 'TAMPERING', 'TARGETING', 'TASTELESS', 'TAXPAYERS', 'TEACHABLE', 'TEACHINGS', 'TEAMMATES',
+    'TECHNICAL', 'TECHNIQUE', 'TEENAGERS', 'TELEGRAPH', 'TELEPHONE', 'TELESCOPE', 'TELEVISED', 'TEMPERATE',
+    'TEMPLATES', 'TEMPORARY', 'TENACIOUS', 'TENTATIVE', 'TERMINALS', 'TERMINATE', 'TERRIFIED', 'TERRITORY',
+    'TERRORISM', 'TERRORIST', 'TERRORIZE', 'TESTAMENT', 'TESTIFIED', 'TESTIMONY', 'TEXTBOOKS', 'THANKLESS',
+    'THERAPIST', 'THEREFORE', 'THICKENED', 'THICKNESS', 'THINKABLE', 'THOUSANDS', 'THREATENS', 'THRESHOLD',
+    'THRILLERS', 'THRILLING', 'THROBBING', 'THROTTLED', 'THROWBACK', 'THUMBNAIL', 'THUNDERED', 'TICKETING',
+    'TIGHTENED', 'TIGHTROPE', 'TIMELINES', 'TIMESTAMP', 'TIMETABLE', 'TIREDNESS', 'TOLERANCE', 'TOLERATED',
+    'TOMBSTONE', 'TORMENTED', 'TORNADOES', 'TORPEDOED', 'TOTALLING', 'TOUCHDOWN', 'TOUGHNESS', 'TRADEMARK',
+    'TRADITION', 'TRAGEDIES', 'TRAINABLE', 'TRANSCEND', 'TRANSFERS', 'TRANSFORM', 'TRANSIENT', 'TRANSLATE',
+    'TRANSMITS', 'TRANSPIRE', 'TRANSPORT', 'TRAPEZOID', 'TRAVELING', 'TRAVELLED', 'TRAVELLER', 'TRAVERSAL',
+    'TREASURED', 'TREASURER', 'TREASURES', 'TREATMENT', 'TREMBLING', 'TRIANGLES', 'TRIBUNALS', 'TRICKIEST',
+    'TRICKLING', 'TRIGGERED', 'TRILLIONS', 'TRIMMINGS', 'TRIUMPHED', 'TROMBONES', 'TROUBLING', 'TRUMPETED',
+    'TRUNCATED', 'TURBULENT', 'TURNOVERS', 'TUTORIALS', 'TWENTIETH', 'TWINKLING', 'TYPICALLY', 'ULTIMATUM',
+    'UNANIMOUS', 'UNCERTAIN', 'UNCHANGED', 'UNCLAIMED', 'UNCLOUDED', 'UNCOVERED', 'UNDECIDED', 'UNDEFINED',
+    'UNDERCUTS', 'UNDERFOOT', 'UNDERGOES', 'UNDERGONE', 'UNDERLINE', 'UNDERMINE', 'UNDERPAID', 'UNDERPASS',
+    'UNDERRATE', 'UNDERSIDE', 'UNDERTAKE', 'UNDERTONE', 'UNDERTOOK', 'UNDERWEAR', 'UNDERWENT', 'UNDIVIDED',
+    'UNDOUBTED', 'UNEARTHED', 'UNEQUALED', 'UNETHICAL', 'UNEXPIRED', 'UNFAILING', 'UNFOLDING', 'UNFOUNDED',
+    'UNHEALTHY', 'UNIFORMED', 'UNIFORMLY', 'UNIMPEDED', 'UNINSURED', 'UNINSTALL', 'UNINVITED', 'UNIONIZED',
+    'UNIVERSAL', 'UNIVERSES', 'UNKNOWING', 'UNLEASHED', 'UNLIMITED', 'UNLOCKING', 'UNMARRIED', 'UNMATCHED',
+    'UNNATURAL', 'UNNOTICED', 'UNPACKING', 'UNPLANNED', 'UNPOPULAR', 'UNRAVELED', 'UNRELATED', 'UNREVISED',
+    'UNSCATHED', 'UNSEATING', 'UNSECURED', 'UNSELFISH', 'UNSETTLED', 'UNSKILLED', 'UNTANGLED', 'UNTENABLE',
+    'UNTOUCHED', 'UNTRAINED', 'UNTREATED', 'UNUSUALLY', 'UNVARYING', 'UNWELCOME', 'UNWILLING', 'UNWITTING',
+    'UNWRAPPED', 'UPHOLDING', 'UPPERCASE', 'UPRISINGS', 'UPROOTING', 'UPSCALING', 'UPSETTING', 'URBANIZED',
+    'USABILITY', 'UTILITIES', 'UTILIZING', 'UTTERANCE', 'VACANCIES', 'VACCINATE', 'VACUUMING', 'VALIDATED',
+    'VALUABLES', 'VALUATION', 'VANDALISM', 'VANISHING', 'VAPORIZED', 'VARIABLES', 'VARIANCES', 'VARIATION',
+    'VARIETIES', 'VEGETABLE', 'VEHEMENCE', 'VEHICULAR', 'VENERABLE', 'VENGEANCE', 'VENTILATE', 'VENTURING',
+    'VERBALIZE', 'VERIFYING', 'VERSATILE', 'VERTEBRAE', 'VERTICALS', 'VESTIBULE', 'VIABILITY', 'VIBRATING',
+    'VIBRATION', 'VICIOUSLY', 'VICTORIES', 'VIDEOGAME', 'VIDEOTAPE', 'VIEWPOINT', 'VIGILANCE', 'VILLAGERS',
+    'VINDICATE', 'VIOLATING', 'VIOLATION', 'VIOLATORS', 'VIOLENTLY', 'VIRTUALLY', 'VISIONARY', 'VISUALIZE',
+    'VIVIDNESS', 'VOLCANISM', 'VOLCANOES', 'VOLUNTARY', 'VOLUNTEER', 'VOUCHSAFE', 'WANDERERS', 'WANDERING',
+    'WAREHOUSE', 'WARRANTED', 'WASHBOARD', 'WASTELAND', 'WATCHABLE', 'WATCHWORD', 'WATERFALL', 'WATERMARK',
+    'WATERWAYS', 'WAVEFORMS', 'WEAKENING', 'WEALTHIER', 'WEDNESDAY', 'WEEKNIGHT', 'WEIRDNESS', 'WELCOMING',
+    'WELLBEING', 'WESTBOUND', 'WESTERNER', 'WESTWARDS', 'WHICHEVER', 'WHIRLPOOL', 'WHIRLWIND', 'WHISPERED',
+    'WHISTLING', 'WHITELIST', 'WHITENESS', 'WHITEWASH', 'WHOLESALE', 'WHOLESOME', 'WILDFIRES', 'WILLFULLY',
+    'WILLINGLY', 'WINDMILLS', 'WINDSTORM', 'WIREFRAME', 'WITHDRAWN', 'WITHERING', 'WITHSTAND', 'WITNESSED',
+    'WITNESSES', 'WONDERFUL', 'WONDERING', 'WOODBLOCK', 'WOODLANDS', 'WOODWORKS', 'WORKBENCH', 'WORKFORCE',
+    'WORKHOUSE', 'WORKLOADS', 'WORKPLACE', 'WORKSHOPS', 'WORKSPACE', 'WORLDVIEW', 'WORLDWIDE', 'WORSENING',
+    'WORTHIEST', 'WORTHLESS', 'WRANGLING', 'WRECKAGES', 'WRESTLING', 'WRISTBAND', 'WRONGDOER', 'WRONGNESS',
+    'YARDSTICK', 'YEARBOOKS', 'YEARNINGS', 'YESTERDAY', 'ZEALOUSLY', 'ZEITGEIST', 'ZIGZAGGED', 'ZOOLOGIST'
+];
+
+var DICTIONARY_API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
+
+// Check API on load
+function checkApiStatus() {
+    fetch(DICTIONARY_API + 'test')
+        .then(function() {
+            document.getElementById('apiStatus').textContent = '✓ Online Dictionary Connected';
+            document.getElementById('apiStatus').className = 'api-status online';
+        })
+        .catch(function() {
+            document.getElementById('apiStatus').textContent = '⚠ Using offline dictionary';
+            document.getElementById('apiStatus').className = 'api-status offline';
+        });
+}
+checkApiStatus();
+
+// Scramble a word
+function scrambleWord(word) {
+    var arr = word.split('');
+    var scrambled = word;
+    var attempts = 0;
+    while (scrambled === word && attempts < 100) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        scrambled = arr.join('');
+        attempts++;
+    }
+    return scrambled;
+}
+
+// ============ BEST WORD FINDER ============
+function findBestWord(availableLetters) {
+    var bestWord = '';
+    var available = availableLetters.slice().map(function(l) { return l.toUpperCase(); });
+    var sortedWords = wordList.slice().sort(function(a, b) { return b.length - a.length; });
+    
+    for (var i = 0; i < sortedWords.length; i++) {
+        var word = sortedWords[i];
+        if (word.length <= available.length && canMakeWord(word, available)) {
+            bestWord = word;
+            break;
+        }
+    }
+    return bestWord;
+}
+
+function canMakeWord(word, availableLetters) {
+    var letters = availableLetters.slice();
+    for (var i = 0; i < word.length; i++) {
+        var char = word[i].toUpperCase();
+        var idx = letters.indexOf(char);
+        if (idx === -1) return false;
+        letters.splice(idx, 1);
+    }
+    return true;
+}
+
+// Validate word via API
+function validateWordAsync(word, availableLetters) {
+    return new Promise(function(resolve) {
+        if (!word || word.length === 0) {
+            resolve({ valid: false, reason: 'No word entered', definition: null });
+            return;
+        }
+        
+        var available = availableLetters.slice();
+        var upperWord = word.toUpperCase();
+        for (var i = 0; i < upperWord.length; i++) {
+            var idx = available.indexOf(upperWord[i]);
+            if (idx === -1) {
+                resolve({ valid: false, reason: 'Uses unavailable letters', definition: null });
+                return;
+            }
+            available.splice(idx, 1);
+        }
+        
+        fetch(DICTIONARY_API + word.toLowerCase())
+            .then(function(response) {
+                if (response.ok) return response.json();
+                throw new Error('Not found');
+            })
+            .then(function(data) {
+                var definition = null;
+                try {
+                    definition = data[0].meanings[0].definitions[0].definition;
+                    if (definition.length > 80) definition = definition.substring(0, 80) + '...';
+                } catch (e) {}
+                resolve({ valid: true, reason: 'Valid word!', definition: definition });
+            })
+            .catch(function() {
+                if (wordSet.has(upperWord)) {
+                    resolve({ valid: true, reason: 'Valid word!', definition: null });
+                } else {
+                    resolve({ valid: false, reason: 'Not in dictionary', definition: null });
+                }
+            });
+    });
+}
+
+// ============ NUMBERS SOLVER ============
+var bestSolution = null;
+var bestDiff = Infinity;
+
+function solveNumbers(nums, target) {
+    bestSolution = null;
+    bestDiff = Infinity;
+    var numObjs = nums.map(function(n) { return { value: n.value, steps: [] }; });
+    solve(numObjs, target);
+    return bestSolution;
+}
+
+function solve(nums, target) {
+    for (var i = 0; i < nums.length; i++) {
+        var diff = Math.abs(nums[i].value - target);
+        if (diff < bestDiff) {
+            bestDiff = diff;
+            bestSolution = { value: nums[i].value, steps: nums[i].steps.slice(), exact: diff === 0 };
+        }
+        if (diff === 0) return;
+    }
+    if (nums.length < 2) return;
+    
+    for (var i = 0; i < nums.length; i++) {
+        for (var j = i + 1; j < nums.length; j++) {
+            var a = nums[i], b = nums[j];
+            var remaining = nums.filter(function(_, k) { return k !== i && k !== j; });
+            
+            var ops = [
+                { result: a.value + b.value, str: a.value + ' + ' + b.value + ' = ' + (a.value + b.value) },
+                { result: a.value - b.value, str: a.value + ' - ' + b.value + ' = ' + (a.value - b.value) },
+                { result: b.value - a.value, str: b.value + ' - ' + a.value + ' = ' + (b.value - a.value) },
+                { result: a.value * b.value, str: a.value + ' × ' + b.value + ' = ' + (a.value * b.value) }
+            ];
+            if (b.value !== 0 && a.value % b.value === 0) ops.push({ result: a.value / b.value, str: a.value + ' ÷ ' + b.value + ' = ' + (a.value / b.value) });
+            if (a.value !== 0 && b.value % a.value === 0) ops.push({ result: b.value / a.value, str: b.value + ' ÷ ' + a.value + ' = ' + (b.value / a.value) });
+            
+            for (var o = 0; o < ops.length; o++) {
+                if (ops[o].result <= 0) continue;
+                var newNum = { value: ops[o].result, steps: a.steps.concat(b.steps).concat([ops[o].str]) };
+                solve(remaining.concat([newNum]), target);
+                if (bestDiff === 0) return;
+            }
+        }
+    }
+}
+
+// ============ MENU ============
+function startLettersGame() { 
+    isFullGame = false; 
+    hideAll(); 
+    document.getElementById('lettersGame').classList.remove('hidden'); 
+    initLetters(); 
+}
+
+function startNumbersGame() { 
+    isFullGame = false; 
+    hideAll(); 
+    document.getElementById('numbersGame').classList.remove('hidden'); 
+    initNumbers(); 
+}
+
+function startConundrumGame() { 
+    isFullGame = false; 
+    hideAll(); 
+    document.getElementById('conundrumGame').classList.remove('hidden'); 
+    initConundrum(); 
+}
+
+function startFullGame() { 
+    isFullGame = true; 
+    fullGameRound = 1; 
+    updateRoundIndicator(); 
+    hideAll(); 
+    document.getElementById('roundIndicator').classList.remove('hidden'); 
+    document.getElementById('lettersGame').classList.remove('hidden'); 
+    initLetters(); 
+}
+
+function resetScores() { 
+    for (var i = 0; i < players.length; i++) {
+        players[i].score = 0;
+    }
+    updateScores();
+    updateScoreboard();
+    alert('Scores reset!'); 
+}
+
+function hideAll() { 
+    ['menu', 'lettersGame', 'numbersGame', 'conundrumGame', 'roundIndicator', 'setupScreen'].forEach(function(id) { 
+        document.getElementById(id).classList.add('hidden'); 
+    }); 
+    document.getElementById('menu').style.display = 'none'; 
+}
+
+function updateRoundIndicator() {
+    document.getElementById('r1').className = fullGameRound === 1 ? 'active' : (fullGameRound > 1 ? 'completed' : '');
+    document.getElementById('r2').className = fullGameRound === 2 ? 'active' : (fullGameRound > 2 ? 'completed' : '');
+    document.getElementById('r3').className = fullGameRound === 3 ? 'active' : '';
+}
+
+function showLoading(show) { 
+    document.getElementById('loadingOverlay').classList.toggle('hidden', !show); 
+}
+
+// ============ GENERATE PLAYER INPUTS ============
+function generateLetterInputs() {
+    var container = document.getElementById('letterPlayerInputs');
+    container.innerHTML = '';
+    letters.playerWords = [];
+    letters.playerLocked = [];
+    
+    for (var i = 0; i < players.length; i++) {
+        letters.playerWords.push('');
+        letters.playerLocked.push(false);
+        
+        var div = document.createElement('div');
+        div.className = 'player-input';
+        div.id = 'pWordBox' + i;
+        div.innerHTML = '<h4 style="color:' + players[i].color + ';">' + players[i].name + '</h4>' +
+            '<input type="text" id="pWord' + i + '" maxlength="9" placeholder="Your word...">' +
+            '<button class="btn btn-green" onclick="lockWord(' + i + ')">Lock In</button>';
+        container.appendChild(div);
+    }
+}
+
+function generateNumberInputs() {
+    var container = document.getElementById('numberPlayerInputs');
+    container.innerHTML = '';
+    numbers.playerAnswers = [];
+    numbers.playerLocked = [];
+    
+    for (var i = 0; i < players.length; i++) {
+        numbers.playerAnswers.push(null);
+        numbers.playerLocked.push(false);
+        
+        var div = document.createElement('div');
+        div.className = 'player-input';
+        div.id = 'pAnswerBox' + i;
+        div.innerHTML = '<h4 style="color:' + players[i].color + ';">' + players[i].name + '</h4>' +
+            '<input type="number" id="pAnswer' + i + '" placeholder="Your answer...">' +
+            '<button class="btn btn-green" onclick="lockAnswer(' + i + ')">Lock In</button>';
+        container.appendChild(div);
+    }
+}
+
+function generateBuzzButtons() {
+    var container = document.getElementById('buzzArea');
+    container.innerHTML = '';
+    conundrum.playersUsed = [];
+    
+    var keyHints = [];
+    var keys = ['1', '2', '3', '4', '5', '6'];
+    
+    for (var i = 0; i < players.length; i++) {
+        conundrum.playersUsed.push(false);
+        
+        var btn = document.createElement('button');
+        btn.className = 'buzz-btn';
+        btn.id = 'buzz' + i;
+        btn.style.background = 'linear-gradient(135deg, ' + players[i].color + ', ' + players[i].color + 'cc)';
+        btn.style.color = (i === 2 || i === 3) ? '#1a1a2e' : 'white'; // Better contrast for green/gold
+        btn.innerHTML = '🔔 ' + players[i].name + '<br><small>Press ' + keys[i] + '</small>';
+        btn.onclick = (function(idx) { return function() { buzz(idx); }; })(i);
+        container.appendChild(btn);
+        
+        keyHints.push('<strong>' + keys[i] + '</strong> = ' + players[i].name);
+    }
+    
+    document.getElementById('buzzKeyHints').innerHTML = 'Keys: ' + keyHints.join(' | ');
+}
+
+// ============ LETTERS ============
+function initLetters() {
+    letters = { selected: [], timer: null, time: 30, phase: 'picking', playerWords: [], playerLocked: [] };
+    var tiles = document.getElementById('letterTiles');
+    tiles.innerHTML = '';
+    for (var i = 0; i < 9; i++) { 
+        var t = document.createElement('div'); 
+        t.className = 'tile'; 
+        t.id = 'ltile' + i; 
+        tiles.appendChild(t); 
+    }
+    document.getElementById('wordInputs').classList.add('hidden');
+    document.getElementById('thinkingDisplay').classList.add('hidden');
+    document.getElementById('lettersTimer').textContent = '30';
+    document.getElementById('lettersTimer').classList.remove('warning');
+    document.getElementById('lettersStatus').textContent = 'Click the decks to select 9 letters';
+    document.querySelectorAll('#letterDecks .deck').forEach(function(d) { d.classList.remove('disabled'); });
+    
+    generateLetterInputs();
+}
+
+function pickLetter(type) {
+    if (letters.phase !== 'picking' || letters.selected.length >= 9) return;
+    initAudio();
+    var pool = type === 'consonant' ? consonants : vowels;
+    var letter = pool.charAt(Math.floor(Math.random() * pool.length));
+    letters.selected.push(letter);
+    var tile = document.getElementById('ltile' + (letters.selected.length - 1));
+    tile.textContent = letter; 
+    tile.classList.add('filled');
+    document.getElementById('lettersStatus').textContent = letters.selected.length + ' of 9 letters';
+    if (letters.selected.length >= 9) startLettersTimer();
+}
+
+function startLettersTimer() {
+    letters.phase = 'thinking';
+    document.querySelectorAll('#letterDecks .deck').forEach(function(d) { d.classList.add('disabled'); });
+    document.getElementById('thinkingDisplay').classList.remove('hidden');
+    document.getElementById('lettersStatus').textContent = '⏱️ Thinking time - find the longest word!';
+    
+    playCountdownMusic();
+    
+    letters.time = 30;
+    letters.timer = setInterval(function() {
+        letters.time--;
+        document.getElementById('lettersTimer').textContent = letters.time;
+        if (letters.time === 10) {
+            document.getElementById('lettersTimer').classList.add('warning');
+            playUrgentMusic();
+        }
+        if (letters.time <= 0) { 
+            clearInterval(letters.timer); 
+            stopCountdownMusic();
+            playTimesUp();
+            showLettersInputs();
+        }
+    }, 1000);
+}
+
+function showLettersInputs() {
+    letters.phase = 'entering';
+    document.getElementById('thinkingDisplay').classList.add('hidden');
+    document.getElementById('wordInputs').classList.remove('hidden');
+    document.getElementById('lettersStatus').textContent = '⏰ Time\'s up! Enter your words now!';
+    document.getElementById('pWord0').focus();
+}
+
+function lockWord(playerIdx) {
+    if (letters.playerLocked[playerIdx]) return;
+    
+    letters.playerWords[playerIdx] = document.getElementById('pWord' + playerIdx).value.toUpperCase();
+    letters.playerLocked[playerIdx] = true;
+    document.getElementById('pWordBox' + playerIdx).classList.add('locked');
+    document.getElementById('pWord' + playerIdx).disabled = true;
+    
+    // Check if all players locked
+    var allLocked = letters.playerLocked.every(function(l) { return l; });
+    if (allLocked) {
+        endLettersRound();
+    }
+}
+
+function endLettersRound() {
+    letters.phase = 'ended';
+    
+    // Collect any unlocked words
+    for (var i = 0; i < players.length; i++) {
+        if (!letters.playerLocked[i]) {
+            letters.playerWords[i] = document.getElementById('pWord' + i).value.toUpperCase();
+        }
+    }
+    
+    showLoading(true);
+    
+    var bestWord = findBestWord(letters.selected);
+    
+    // Validate all words
+    var validationPromises = letters.playerWords.map(function(word) {
+        return validateWordAsync(word, letters.selected);
+    });
+    
+    Promise.all(validationPromises).then(function(results) {
+        showLoading(false);
+        
+        // Calculate points
+        var points = results.map(function(r, i) {
+            return r.valid ? letters.playerWords[i].length * 2 : 0;
+        });
+        
+        // Find highest score
+        var maxPoints = Math.max.apply(null, points);
+        
+        // Award points to winner(s)
+        var awards = points.map(function(p) {
+            if (maxPoints === 0) return 0;
+            return (p === maxPoints) ? p : 0;
+        });
+        
+        // Update scores
+        for (var i = 0; i < players.length; i++) {
+            players[i].score += awards[i];
+        }
+        updateScores();
+        
+        if (maxPoints > 0) playCorrect();
+        
+        showLettersModal(results, points, awards, bestWord);
+    });
+}
+
+function showLettersModal(results, points, awards, bestWord) {
+    document.getElementById('modalTitle').textContent = 'Letters Round Results';
+    
+    var html = '';
+    var maxAward = Math.max.apply(null, awards);
+    
+    for (var i = 0; i < players.length; i++) {
+        var isWinner = awards[i] > 0 && awards[i] === maxAward;
+        html += '<div class="result-box ' + (isWinner ? 'winner' : '') + '">' +
+            '<div class="word" style="color:' + players[i].color + ';">' + players[i].name + ': "' + (letters.playerWords[i] || '-') + '"</div>' +
+            '<div class="info ' + (results[i].valid ? 'valid' : 'invalid') + '">' + 
+            (results[i].valid ? '✓ ' : '✗ ') + results[i].reason + 
+            (results[i].valid ? ' (' + points[i] + ' pts)' : '') + '</div>' +
+            (results[i].definition ? '<div class="definition">📖 ' + results[i].definition + '</div>' : '') +
+            '</div>';
+    }
+    
+    var awardSummary = players.map(function(p, i) { return p.name + ' +' + awards[i]; }).join(' | ');
+    html += '<div class="points-box">' + awardSummary + '</div>';
+    
+    if (bestWord) {
+        html += '<div class="best-word-box"><h4>💡 Best Possible Word</h4><div class="best-word">' + bestWord + '</div><div class="info">(' + bestWord.length + ' letters = ' + (bestWord.length * 2) + ' points)</div></div>';
+    }
+    
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+// ============ NUMBERS ============
+function initNumbers() {
+    numbers = { selected: [], target: null, timer: null, time: 30, phase: 'picking', playerAnswers: [], playerLocked: [] };
+    var tiles = document.getElementById('numberTiles');
+    tiles.innerHTML = '';
+    for (var i = 0; i < 6; i++) { 
+        var t = document.createElement('div'); 
+        t.className = 'tile'; 
+        t.id = 'ntile' + i; 
+        tiles.appendChild(t); 
+    }
+    document.getElementById('answerInputs').classList.add('hidden');
+    document.getElementById('numbersThinkingDisplay').classList.add('hidden');
+    document.getElementById('numbersTimer').textContent = '30';
+    document.getElementById('numbersTimer').classList.remove('warning');
+    document.getElementById('targetNumber').textContent = '???';
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('numbersStatus').textContent = 'Click the decks to select 6 numbers';
+    document.querySelectorAll('#numberDecks .deck').forEach(function(d) { d.classList.remove('disabled'); });
+    
+    generateNumberInputs();
+}
+
+function pickNumber(type) {
+    if (numbers.phase !== 'picking' || numbers.selected.length >= 6) return;
+    initAudio();
+    var num = type === 'small' ? Math.floor(Math.random() * 10) + 1 : [25, 50, 75, 100][Math.floor(Math.random() * 4)];
+    numbers.selected.push({ value: num, type: type });
+    var tile = document.getElementById('ntile' + (numbers.selected.length - 1));
+    tile.textContent = num; 
+    tile.classList.add(type);
+    document.getElementById('numbersStatus').textContent = numbers.selected.length + ' of 6 numbers';
+    if (numbers.selected.length >= 6) {
+        document.querySelectorAll('#numberDecks .deck').forEach(function(d) { d.classList.add('disabled'); });
+        document.getElementById('generateBtn').disabled = false;
+        document.getElementById('numbersStatus').textContent = 'Click "Generate Target"!';
+    }
+}
+
+function generateTarget() {
+    numbers.target = Math.floor(Math.random() * 900) + 100;
+    document.getElementById('targetNumber').textContent = numbers.target;
+    document.getElementById('generateBtn').disabled = true;
+    startNumbersTimer();
+}
+
+function startNumbersTimer() {
+    numbers.phase = 'thinking';
+    document.getElementById('numbersThinkingDisplay').classList.remove('hidden');
+    document.getElementById('numbersStatus').textContent = '⏱️ Thinking time - reach ' + numbers.target + '!';
+    
+    playCountdownMusic();
+    
+    numbers.time = 30;
+    numbers.timer = setInterval(function() {
+        numbers.time--;
+        document.getElementById('numbersTimer').textContent = numbers.time;
+        if (numbers.time === 10) {
+            document.getElementById('numbersTimer').classList.add('warning');
+            playUrgentMusic();
+        }
+        if (numbers.time <= 0) { 
+            clearInterval(numbers.timer); 
+            stopCountdownMusic();
+            playTimesUp();
+            showNumbersInputs();
+        }
+    }, 1000);
+}
+
+function showNumbersInputs() {
+    numbers.phase = 'entering';
+    document.getElementById('numbersThinkingDisplay').classList.add('hidden');
+    document.getElementById('answerInputs').classList.remove('hidden');
+    document.getElementById('numbersStatus').textContent = '⏰ Time\'s up! Enter your answers now!';
+    document.getElementById('pAnswer0').focus();
+}
+
+function lockAnswer(playerIdx) {
+    if (numbers.playerLocked[playerIdx]) return;
+    
+    numbers.playerAnswers[playerIdx] = parseInt(document.getElementById('pAnswer' + playerIdx).value) || null;
+    numbers.playerLocked[playerIdx] = true;
+    document.getElementById('pAnswerBox' + playerIdx).classList.add('locked');
+    document.getElementById('pAnswer' + playerIdx).disabled = true;
+    
+    var allLocked = numbers.playerLocked.every(function(l) { return l; });
+    if (allLocked) {
+        endNumbersRound();
+    }
+}
+
+function endNumbersRound() {
+    numbers.phase = 'ended';
+    
+    for (var i = 0; i < players.length; i++) {
+        if (!numbers.playerLocked[i]) {
+            numbers.playerAnswers[i] = parseInt(document.getElementById('pAnswer' + i).value) || null;
+        }
+    }
+    
+    var target = numbers.target;
+    
+    function calcScore(diff) { 
+        if (diff === 0) return 10; 
+        if (diff <= 5) return 7; 
+        if (diff <= 10) return 5; 
+        if (diff <= 25) return 3; 
+        if (diff <= 50) return 1; 
+        return 0; 
+    }
+    
+    var diffs = numbers.playerAnswers.map(function(ans) {
+        return ans !== null ? Math.abs(target - ans) : 999999;
+    });
+    
+    var points = diffs.map(calcScore);
+    
+    // Find best (lowest) diff
+    var minDiff = Math.min.apply(null, diffs);
+    
+    // Award points to closest player(s)
+    var awards = diffs.map(function(d, i) {
+        if (minDiff === 999999) return 0;
+        return (d === minDiff) ? points[i] : 0;
+    });
+    
+    for (var i = 0; i < players.length; i++) {
+        players[i].score += awards[i];
+    }
+    updateScores();
+    
+    if (Math.max.apply(null, awards) > 0) playCorrect();
+    
+    var solution = solveNumbers(numbers.selected, target);
+    showNumbersModal(diffs, points, awards, solution);
+}
+
+function showNumbersModal(diffs, points, awards, solution) {
+    document.getElementById('modalTitle').textContent = 'Numbers Round Results';
+    
+    var html = '<div style="font-size:1.3rem;margin-bottom:15px;"><strong>Target: ' + numbers.target + '</strong></div>';
+    
+    var maxAward = Math.max.apply(null, awards);
+    
+    for (var i = 0; i < players.length; i++) {
+        var isWinner = awards[i] > 0 && awards[i] === maxAward;
+        html += '<div class="result-box ' + (isWinner ? 'winner' : '') + '">' +
+            '<div class="word" style="color:' + players[i].color + ';">' + players[i].name + ': ' + (numbers.playerAnswers[i] !== null ? numbers.playerAnswers[i] : '-') + '</div>' +
+            '<div class="info">' + (numbers.playerAnswers[i] !== null ? 'Off by ' + diffs[i] : 'No answer') + '</div></div>';
+    }
+    
+    html += '<div style="font-size:0.85rem;margin:15px 0;padding:10px;background:#f0f0f0;border-radius:5px;">Scoring: Exact=10 | ≤5=7 | ≤10=5 | ≤25=3 | ≤50=1</div>';
+    
+    var awardSummary = players.map(function(p, i) { return p.name + ' +' + awards[i]; }).join(' | ');
+    html += '<div class="points-box">' + awardSummary + '</div>';
+    
+    if (solution) {
+        html += '<div class="solution-box"><h4>💡 One Solution</h4>';
+        if (solution.steps.length > 0) {
+            solution.steps.forEach(function(s) { html += '<div class="solution-step">' + s + '</div>'; });
+        } else {
+            html += '<div class="solution-step">Use ' + solution.value + ' directly</div>';
+        }
+        html += '<div class="solution-result ' + (solution.exact ? 'exact' : '') + '">' + 
+            (solution.exact ? '✓ Exact: ' + solution.value : 'Best: ' + solution.value + ' (off by ' + Math.abs(numbers.target - solution.value) + ')') + 
+            '</div></div>';
+    }
+    
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+// ============ CONUNDRUM ============
+function initConundrum() {
+    conundrum = { word: '', scrambled: '', timer: null, answerTimer: null, time: 30, answerTime: 5, phase: 'waiting', buzzedPlayer: null, playersUsed: [] };
+    var tiles = document.getElementById('conundrumTiles');
+    tiles.innerHTML = '';
+    for (var i = 0; i < 9; i++) { 
+        var t = document.createElement('div'); 
+        t.className = 'tile conundrum'; 
+        t.id = 'ctile' + i; 
+        t.textContent = '?'; 
+        tiles.appendChild(t); 
+    }
+    document.getElementById('conundrumTimer').textContent = '30';
+    document.getElementById('conundrumTimer').classList.remove('warning');
+    document.getElementById('conundrumStatus').textContent = 'Press "Start Conundrum" when all players are ready!';
+    document.getElementById('startConundrumBtn').classList.remove('hidden');
+    document.getElementById('buzzArea').classList.add('hidden');
+    document.getElementById('answerSection').classList.add('hidden');
+    
+    generateBuzzButtons();
+}
+
+function revealConundrum() {
+    initAudio();
+    conundrum.word = conundrumWords[Math.floor(Math.random() * conundrumWords.length)];
+    conundrum.scrambled = scrambleWord(conundrum.word);
+    conundrum.phase = 'playing';
+    
+    document.getElementById('startConundrumBtn').classList.add('hidden');
+    document.getElementById('buzzArea').classList.remove('hidden');
+    document.getElementById('conundrumStatus').textContent = 'Unscramble the word! Buzz in to answer!';
+    
+    for (var i = 0; i < 9; i++) {
+        (function(index) {
+            setTimeout(function() {
+                var tile = document.getElementById('ctile' + index);
+                tile.textContent = conundrum.scrambled[index];
+                tile.classList.add('reveal');
+            }, index * 150);
+        })(i);
+    }
+    
+    setTimeout(function() {
+        startConundrumTimer();
+    }, 9 * 150 + 300);
+}
+
+function startConundrumTimer() {
+    playCountdownMusic();
+    
+    conundrum.time = 30;
+    conundrum.timer = setInterval(function() {
+        conundrum.time--;
+        document.getElementById('conundrumTimer').textContent = conundrum.time;
+        if (conundrum.time === 10) {
+            document.getElementById('conundrumTimer').classList.add('warning');
+            playUrgentMusic();
+        }
+        if (conundrum.time <= 0) { 
+            clearInterval(conundrum.timer); 
+            stopCountdownMusic();
+            playTimesUp();
+            endConundrumRound(false, -1); 
+        }
+    }, 1000);
+}
+
+function buzz(playerIdx) {
+    if (conundrum.phase !== 'playing') return;
+    if (conundrum.playersUsed[playerIdx]) return;
+    
+    clearInterval(conundrum.timer);
+    stopCountdownMusic();
+    playBuzzer();
+    conundrum.phase = 'buzzed';
+    conundrum.buzzedPlayer = playerIdx;
+    
+    document.getElementById('buzz' + playerIdx).classList.add('active');
+    for (var i = 0; i < players.length; i++) {
+        document.getElementById('buzz' + i).disabled = true;
+    }
+    
+    document.getElementById('answerSection').classList.remove('hidden');
+    document.getElementById('answerPrompt').textContent = players[playerIdx].name + ' - Type your answer!';
+    document.getElementById('conundrumInput').value = '';
+    document.getElementById('conundrumInput').focus();
+    document.getElementById('conundrumStatus').textContent = players[playerIdx].name + ' buzzed in! 5 seconds to answer!';
+    
+    conundrum.answerTime = 5;
+    document.getElementById('answerTimer').textContent = '5';
+    conundrum.answerTimer = setInterval(function() {
+        conundrum.answerTime--;
+        document.getElementById('answerTimer').textContent = conundrum.answerTime;
+        if (conundrum.answerTime <= 0) {
+            clearInterval(conundrum.answerTimer);
+            submitConundrumAnswer();
+        }
+    }, 1000);
+}
+
+function submitConundrumAnswer() {
+    clearInterval(conundrum.answerTimer);
+    var answer = document.getElementById('conundrumInput').value.toUpperCase().trim();
+    var playerIdx = conundrum.buzzedPlayer;
+    
+    if (answer === conundrum.word) {
+        conundrum.phase = 'ended';
+        playCorrect();
+        endConundrumRound(true, playerIdx);
+    } else {
+        playWrong();
+        conundrum.playersUsed[playerIdx] = true;
+        
+        document.getElementById('buzz' + playerIdx).disabled = true;
+        document.getElementById('buzz' + playerIdx).classList.remove('active');
+        document.getElementById('answerSection').classList.add('hidden');
+        
+        // Check if all players have used their chance
+        var allUsed = conundrum.playersUsed.every(function(u) { return u; });
+        if (allUsed) {
+            endConundrumRound(false, -1);
+        } else {
+            conundrum.phase = 'playing';
+            
+            // Enable remaining players
+            for (var i = 0; i < players.length; i++) {
+                if (!conundrum.playersUsed[i]) {
+                    document.getElementById('buzz' + i).disabled = false;
+                }
+            }
+            
+            document.getElementById('conundrumStatus').textContent = 'Wrong! Others can still buzz in!';
+            
+            playCountdownMusic();
+            
+            conundrum.timer = setInterval(function() {
+                conundrum.time--;
+                document.getElementById('conundrumTimer').textContent = conundrum.time;
+                if (conundrum.time === 10) {
+                    document.getElementById('conundrumTimer').classList.add('warning');
+                    playUrgentMusic();
+                }
+                if (conundrum.time <= 0) { 
+                    clearInterval(conundrum.timer); 
+                    stopCountdownMusic();
+                    playTimesUp();
+                    endConundrumRound(false, -1); 
+                }
+            }, 1000);
+        }
+    }
+}
+
+function endConundrumRound(solved, winnerIdx) {
+    clearInterval(conundrum.timer);
+    clearInterval(conundrum.answerTimer);
+    stopCountdownMusic();
+    conundrum.phase = 'ended';
+    
+    document.getElementById('buzzArea').classList.add('hidden');
+    document.getElementById('answerSection').classList.add('hidden');
+    
+    if (solved && winnerIdx >= 0) {
+        players[winnerIdx].score += 10;
+        updateScores();
+    }
+    
+    for (var i = 0; i < 9; i++) {
+        var tile = document.getElementById('ctile' + i);
+        tile.textContent = conundrum.word[i];
+        if (solved) tile.style.background = 'linear-gradient(135deg, #11998e, #38ef7d)';
+    }
+    
+    showConundrumModal(solved, winnerIdx);
+}
+
+function showConundrumModal(solved, winnerIdx) {
+    document.getElementById('modalTitle').textContent = '🧩 Conundrum Results';
+    
+    var html = '<div class="conundrum-answer-box"><h4>The Answer Was:</h4><div class="answer-word">' + conundrum.word + '</div></div>';
+    
+    if (solved && winnerIdx >= 0) {
+        html += '<div class="result-box winner"><div class="word" style="color:' + players[winnerIdx].color + ';">🎉 ' + players[winnerIdx].name + ' solved it!</div><div class="info valid">+10 points!</div></div>';
+    } else {
+        html += '<div class="result-box"><div class="word">😔 Nobody solved it!</div><div class="info">No points awarded</div></div>';
+    }
+    
+    var scoreSummary = players.map(function(p) { return p.name + ' = ' + p.score; }).join(' | ');
+    html += '<div class="points-box">Scores: ' + scoreSummary + '</div>';
+    
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+// ============ MODAL ============
+function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    
+    if (isFullGame) {
+        if (fullGameRound === 1) {
+            fullGameRound = 2;
+            updateRoundIndicator();
+            document.getElementById('lettersGame').classList.add('hidden');
+            document.getElementById('numbersGame').classList.remove('hidden');
+            initNumbers();
+        } else if (fullGameRound === 2) {
+            fullGameRound = 3;
+            updateRoundIndicator();
+            document.getElementById('numbersGame').classList.add('hidden');
+            document.getElementById('conundrumGame').classList.remove('hidden');
+            initConundrum();
+        } else {
+            showFinalResults();
+        }
+    } else {
+        document.getElementById('lettersGame').classList.add('hidden');
+        document.getElementById('numbersGame').classList.add('hidden');
+        document.getElementById('conundrumGame').classList.add('hidden');
+        document.getElementById('roundIndicator').classList.add('hidden');
+        document.getElementById('menu').classList.remove('hidden');
+        document.getElementById('menu').style.display = 'block';
+    }
+}
+
+function showFinalResults() {
+    // Sort players by score
+    var sortedPlayers = players.slice().sort(function(a, b) { return b.score - a.score; });
+    var topScore = sortedPlayers[0].score;
+    var winners = sortedPlayers.filter(function(p) { return p.score === topScore; });
+    
+    var winnerText = winners.length > 1 
+        ? "It's a Tie!" 
+        : winners[0].name + ' Wins!';
+    
+    if (winners.length === 1) {
+        playCorrect();
+        setTimeout(playCorrect, 300);
+    }
+    
+    document.getElementById('modalTitle').textContent = '🏆 Final Results 🏆';
+    
+    var html = '<div style="font-size:1.8rem;margin-bottom:20px;"><strong>' + winnerText + '</strong></div>';
+    
+    html += '<table class="final-results-table"><thead><tr><th>Rank</th><th>Player</th><th>Score</th></tr></thead><tbody>';
+    
+    var medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+    for (var i = 0; i < sortedPlayers.length; i++) {
+        var isWinner = sortedPlayers[i].score === topScore;
+        html += '<tr class="' + (isWinner ? 'winner-row' : '') + '">' +
+            '<td class="rank">' + medals[i] + '</td>' +
+            '<td style="color:' + sortedPlayers[i].color + ';font-weight:bold;">' + sortedPlayers[i].name + '</td>' +
+            '<td>' + sortedPlayers[i].score + '</td></tr>';
+    }
+    
+    html += '</tbody></table>';
+    
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modal').classList.remove('hidden');
+    
+    isFullGame = false;
+    fullGameRound = 0;
+}
+
+// ============ KEYBOARD ============
+document.addEventListener('keydown', function(e) {
+    if (conundrum.phase === 'playing') {
+        var keyNum = parseInt(e.key);
+        if (keyNum >= 1 && keyNum <= players.length) {
+            buzz(keyNum - 1);
+        }
+    }
+    if (conundrum.phase === 'buzzed' && e.key === 'Enter') {
+        submitConundrumAnswer();
+    }
+});
+
+// Initialize with 2 default players if none exist
+if (players.length === 0) {
+    players = [
+        { name: 'Player 1', score: 0, color: playerColors[0] },
+        { name: 'Player 2', score: 0, color: playerColors[1] }
+    ];
+    updateScoreboard();
+}
+
+console.log('Countdown game loaded with multi-player support!');
+</script>
+</body>
+</html>
+
